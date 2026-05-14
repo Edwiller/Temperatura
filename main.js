@@ -3,11 +3,10 @@ import { carregarComparativo } from "./comparativo.js"
 import { filtrarDadosGrafico } from "./chart.js"
 
 const ctx =
-document.getElementById("graficoTemperatura")
+    document.getElementById("graficoTemperatura")
 
 let grafico = null
 
-// guarda último registro carregado
 let ultimoRegistro = null
 
 async function carregarDados() {
@@ -19,7 +18,7 @@ async function carregarDados() {
             hoje.getFullYear(),
             hoje.getMonth(),
             hoje.getDate(),
-            0,0,0
+            0, 0, 0
         ).toISOString()
 
     const fimHoje =
@@ -27,20 +26,19 @@ async function carregarDados() {
             hoje.getFullYear(),
             hoje.getMonth(),
             hoje.getDate(),
-            23,59,59
+            23, 59, 59
         ).toISOString()
 
     document.getElementById("tituloHoje")
-    .innerHTML =
-    `Temperatura ${hoje.toLocaleDateString("pt-BR")}`
+        .innerHTML =
+        `Temperatura ${hoje.toLocaleDateString("pt-BR")}`
 
-    // BUSCA APENAS DADOS DE HOJE
     const { data, error } = await supabase
-    .from("temperaturas")
-    .select("*")
-    .gte("data", inicioHoje)
-    .lte("data", fimHoje)
-    .order("data", { ascending: true })
+        .from("temperaturas")
+        .select("*")
+        .gte("data", inicioHoje)
+        .lte("data", fimHoje)
+        .order("data", { ascending: true })
 
     if (error) {
         console.log(error)
@@ -51,71 +49,109 @@ async function carregarDados() {
         return
     }
 
-    // PEGA O ÚLTIMO REGISTRO
     const ultimoAtual =
         data[data.length - 1].id
 
-    // NÃO ATUALIZA SE NÃO HOUVER NOVOS DADOS
     if (ultimoRegistro === ultimoAtual) {
         return
     }
 
     ultimoRegistro = ultimoAtual
 
-    // FILTRA DADOS
+    // FILTRA DADOS REPETIDOS
     const filtrado =
-        filtrarDadosGrafico(data).slice(-100)
+        filtrarDadosGrafico(data)
 
     const valores =
         filtrado.map(i => i.valor)
 
+    // =========================
     // CARDS
+    // =========================
+
     document.getElementById("tempAtual")
-    .innerHTML =
-    `${valores[valores.length - 1]?.toFixed(2)}°C`
+        .innerHTML =
+        `${valores[valores.length - 1]?.toFixed(2)}°C`
 
     document.getElementById("tempMax")
-    .innerHTML =
-    `${Math.max(...valores).toFixed(2)}°C`
+        .innerHTML =
+        `${Math.max(...valores).toFixed(2)}°C`
 
     document.getElementById("tempMin")
-    .innerHTML =
-    `${Math.min(...valores).toFixed(2)}°C`
+        .innerHTML =
+        `${Math.min(...valores).toFixed(2)}°C`
 
-    // DESTRÓI GRÁFICO ANTIGO
+    // =========================
+    // HORÁRIOS PT-BR
+    // =========================
+
+    const labels = filtrado.map(item => {
+
+        const dataBR =
+            new Date(item.data)
+
+        return dataBR.toLocaleTimeString("pt-BR", {
+
+            hour: "2-digit",
+
+            minute: "2-digit"
+        })
+    })
+
+    // =========================
+    // VALORES
+    // =========================
+
+    const valoresGrafico =
+        filtrado.map(item => item.valor)
+
+    // =========================
+    // DESTRÓI ANTIGO
+    // =========================
+
     if (grafico) {
         grafico.destroy()
     }
 
-    // CRIA NOVO
+    // =========================
+    // NOVO GRÁFICO
+    // =========================
+
     grafico = new Chart(ctx, {
 
         type: "line",
 
         data: {
 
-            labels: filtrado.map(i =>
-                new Date(i.data)
-                .toLocaleTimeString("pt-BR")
-            ),
+            labels: labels,
 
             datasets: [{
+
                 label: "Temperatura",
 
-                data: valores,
+                data: valoresGrafico,
 
-                borderColor: "#2563eb",
+                borderColor: "#4f7cff",
 
-                backgroundColor:
-                "rgba(37,99,235,.15)",
+                backgroundColor: "rgba(79,124,255,0.25)",
 
                 fill: true,
 
                 tension: 0.4,
 
+                cubicInterpolationMode: "monotone",
+
+                borderWidth: 3,
+
                 pointRadius: 4,
 
-                pointHoverRadius: 6
+                pointHoverRadius: 7,
+
+                pointBackgroundColor: "#4f7cff",
+
+                pointBorderColor: "#ffffff",
+
+                pointBorderWidth: 2
             }]
         },
 
@@ -123,13 +159,32 @@ async function carregarDados() {
 
             responsive: true,
 
+            maintainAspectRatio: false,
+
+            interaction: {
+
+                intersect: false,
+
+                mode: "index"
+            },
+
             plugins: {
+
                 legend: {
+
                     labels: {
+
                         color:
-                        document.body.classList.contains("dark")
-                        ? "#fff"
-                        : "#000"
+                            document.body.classList.contains("dark")
+                                ? "#fff"
+                                : "#000",
+
+                        font: {
+
+                            size: 16,
+
+                            weight: "bold"
+                        }
                     }
                 }
             },
@@ -137,31 +192,43 @@ async function carregarDados() {
             scales: {
 
                 x: {
+
                     ticks: {
+
                         color:
-                        document.body.classList.contains("dark")
-                        ? "#fff"
-                        : "#000"
+                            document.body.classList.contains("dark")
+                                ? "#fff"
+                                : "#000",
+
+                        maxRotation: 0,
+
+                        autoSkip: true,
+
+                        maxTicksLimit: 12
                     },
 
                     grid: {
+
                         display: false
                     }
                 },
 
                 y: {
+
                     ticks: {
+
                         color:
-                        document.body.classList.contains("dark")
-                        ? "#fff"
-                        : "#000"
+                            document.body.classList.contains("dark")
+                                ? "#fff"
+                                : "#000"
                     },
 
                     grid: {
+
                         color:
-                        document.body.classList.contains("dark")
-                        ? "rgba(255,255,255,.08)"
-                        : "rgba(0,0,0,.08)"
+                            document.body.classList.contains("dark")
+                                ? "rgba(255,255,255,.06)"
+                                : "rgba(0,0,0,.06)"
                     }
                 }
             }
@@ -171,70 +238,72 @@ async function carregarDados() {
 
 flatpickr("#intervalo", {
 
-mode:"range",
+    mode: "range",
 
-locale:"pt",
+    locale: "pt",
 
-dateFormat:"d/m/Y"
-
+    dateFormat: "d/m/Y"
 })
 
 // PRIMEIRA CARGA
+
 carregarDados()
 
 // ATUALIZA A CADA 5 SEGUNDOS
+
 setInterval(carregarDados, 5000)
 
 /* MENU */
 
 const menuBtn =
-document.getElementById("menuBtn")
+    document.getElementById("menuBtn")
 
 const sidebar =
-document.getElementById("sidebar")
+    document.getElementById("sidebar")
 
 menuBtn.onclick = () => {
+
     sidebar.classList.toggle("open")
 }
 
 /* TEMA */
 
 document.getElementById("temaBtn")
-.onclick = () => {
+    .onclick = () => {
 
-    document.body.classList.toggle("dark")
+        document.body.classList.toggle("dark")
 
-    carregarDados()
-}
+        carregarDados()
+    }
 
 /* NAVEGAÇÃO */
 
 document.querySelectorAll(".nav-btn")
-.forEach(btn => {
+    .forEach(btn => {
 
-    btn.onclick = () => {
+        btn.onclick = () => {
 
-        document.querySelectorAll(".nav-btn")
-        .forEach(b =>
-            b.classList.remove("active")
-        )
+            document.querySelectorAll(".nav-btn")
+                .forEach(b =>
+                    b.classList.remove("active")
+                )
 
-        btn.classList.add("active")
+            btn.classList.add("active")
 
-        const page =
-            btn.dataset.page
+            const page =
+                btn.dataset.page
 
-        document.querySelectorAll(".page")
-        .forEach(p =>
-            p.classList.remove("active")
-        )
+            document.querySelectorAll(".page")
+                .forEach(p =>
+                    p.classList.remove("active")
+                )
 
-        document.getElementById(page)
-        .classList.add("active")
-    }
-})
+            document.getElementById(page)
+                .classList.add("active")
+        }
+    })
 
 /* COMPARATIVO */
 
 document.getElementById("btnComparar")
-.onclick = carregarComparativo
+    .onclick = carregarComparativo
