@@ -1,54 +1,58 @@
-export function filtrarDadosGrafico(dados) {
+export function filtrarDadosGrafico(data) {
 
-    if (!dados || dados.length === 0) {
+    if (!data || data.length === 0) {
         return []
     }
 
-    let resultado = []
+    const resultado = []
 
     let ultimoValor = null
-    let ultimoTempo = 0
 
-    dados.forEach(item => {
+    let ultimoHorario = null
 
-        const valor = Number(item.valor).toFixed(2)
+    data.forEach(item => {
 
-        const tempoAtual =
-            new Date(item.data).getTime()
+        const dataAtual =
+            new Date(item.data)
 
-        // PRIMEIRO REGISTRO
+        const valorAtual =
+            Number(item.valor)
+
+        // PRIMEIRO ITEM
         if (ultimoValor === null) {
 
             resultado.push(item)
 
-            ultimoValor = valor
-            ultimoTempo = tempoAtual
+            ultimoValor = valorAtual
+
+            ultimoHorario = dataAtual
 
             return
         }
 
-        const diferencaTempo =
-            tempoAtual - ultimoTempo
+        // DIFERENÇA EM MINUTOS
+        const diferencaMinutos =
+            (dataAtual - ultimoHorario) / 1000 / 60
 
-        // 3 MINUTOS
-        const tresMinutos =
-            3 * 60 * 1000
-
-        // SÓ ADICIONA SE:
-        // passou 3 minutos
-        // E o valor mudou
-
-        if (
-            diferencaTempo >= tresMinutos &&
-            valor !== ultimoValor
-        ) {
+        // SE MUDOU VALOR → ADICIONA
+        if (valorAtual !== ultimoValor) {
 
             resultado.push(item)
 
-            ultimoValor = valor
-            ultimoTempo = tempoAtual
+            ultimoValor = valorAtual
+
+            ultimoHorario = dataAtual
+
+            return
         }
 
+        // SE PASSOU 3 MIN → ADICIONA
+        if (diferencaMinutos >= 3) {
+
+            resultado.push(item)
+
+            ultimoHorario = dataAtual
+        }
     })
 
     return resultado

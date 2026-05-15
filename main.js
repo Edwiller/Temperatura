@@ -13,52 +13,53 @@ async function carregarDados() {
 
     const hoje = new Date()
 
-    const inicioHoje =
-        new Date(
-            hoje.getFullYear(),
-            hoje.getMonth(),
-            hoje.getDate(),
-            0, 0, 0
-        ).toISOString()
+    // INÍCIO DO DIA
+    const inicioHoje = new Date()
 
-    const fimHoje =
-        new Date(
-            hoje.getFullYear(),
-            hoje.getMonth(),
-            hoje.getDate(),
-            23, 59, 59
-        ).toISOString()
+    inicioHoje.setHours(0, 0, 0, 0)
+
+    // FIM DO DIA
+    const fimHoje = new Date()
+
+    fimHoje.setHours(23, 59, 59, 999)
 
     document.getElementById("tituloHoje")
         .innerHTML =
         `Temperatura ${hoje.toLocaleDateString("pt-BR")}`
 
+    // BUSCA DADOS DO DIA
     const { data, error } = await supabase
         .from("temperaturas")
         .select("*")
-        .gte("data", inicioHoje)
-        .lte("data", fimHoje)
+        .gte("data", inicioHoje.toISOString())
+        .lte("data", fimHoje.toISOString())
         .order("data", { ascending: true })
 
     if (error) {
+
         console.log(error)
+
         return
     }
 
     if (!data || data.length === 0) {
+
         return
     }
 
+    // ÚLTIMO REGISTRO
     const ultimoAtual =
         data[data.length - 1].id
 
+    // EVITA RECARREGAR SEM DADOS NOVOS
     if (ultimoRegistro === ultimoAtual) {
+
         return
     }
 
     ultimoRegistro = ultimoAtual
 
-    // FILTRA DADOS REPETIDOS
+    // FILTRO PERSONALIZADO
     const filtrado =
         filtrarDadosGrafico(data)
 
@@ -82,7 +83,7 @@ async function carregarDados() {
         `${Math.min(...valores).toFixed(2)}°C`
 
     // =========================
-    // HORÁRIOS PT-BR
+    // HORÁRIOS EM PT-BR
     // =========================
 
     const labels = filtrado.map(item => {
@@ -94,7 +95,9 @@ async function carregarDados() {
 
             hour: "2-digit",
 
-            minute: "2-digit"
+            minute: "2-digit",
+
+            second: "2-digit"
         })
     })
 
@@ -106,10 +109,11 @@ async function carregarDados() {
         filtrado.map(item => item.valor)
 
     // =========================
-    // DESTRÓI ANTIGO
+    // DESTROI ANTIGO
     // =========================
 
     if (grafico) {
+
         grafico.destroy()
     }
 
@@ -133,13 +137,15 @@ async function carregarDados() {
 
                 borderColor: "#4f7cff",
 
-                backgroundColor: "rgba(79,124,255,0.25)",
+                backgroundColor:
+                    "rgba(79,124,255,0.25)",
 
                 fill: true,
 
                 tension: 0.4,
 
-                cubicInterpolationMode: "monotone",
+                cubicInterpolationMode:
+                    "monotone",
 
                 borderWidth: 3,
 
@@ -147,9 +153,11 @@ async function carregarDados() {
 
                 pointHoverRadius: 7,
 
-                pointBackgroundColor: "#4f7cff",
+                pointBackgroundColor:
+                    "#4f7cff",
 
-                pointBorderColor: "#ffffff",
+                pointBorderColor:
+                    "#ffffff",
 
                 pointBorderWidth: 2
             }]
@@ -175,7 +183,9 @@ async function carregarDados() {
                     labels: {
 
                         color:
-                            document.body.classList.contains("dark")
+                            document.body
+                                .classList
+                                .contains("dark")
                                 ? "#fff"
                                 : "#000",
 
@@ -196,7 +206,9 @@ async function carregarDados() {
                     ticks: {
 
                         color:
-                            document.body.classList.contains("dark")
+                            document.body
+                                .classList
+                                .contains("dark")
                                 ? "#fff"
                                 : "#000",
 
@@ -218,7 +230,9 @@ async function carregarDados() {
                     ticks: {
 
                         color:
-                            document.body.classList.contains("dark")
+                            document.body
+                                .classList
+                                .contains("dark")
                                 ? "#fff"
                                 : "#000"
                     },
@@ -226,7 +240,9 @@ async function carregarDados() {
                     grid: {
 
                         color:
-                            document.body.classList.contains("dark")
+                            document.body
+                                .classList
+                                .contains("dark")
                                 ? "rgba(255,255,255,.06)"
                                 : "rgba(0,0,0,.06)"
                     }
@@ -235,6 +251,10 @@ async function carregarDados() {
         }
     })
 }
+
+// =========================
+// FLATPICKR
+// =========================
 
 flatpickr("#intervalo", {
 
@@ -245,15 +265,25 @@ flatpickr("#intervalo", {
     dateFormat: "d/m/Y"
 })
 
+// =========================
 // PRIMEIRA CARGA
+// =========================
 
 carregarDados()
 
-// ATUALIZA A CADA 5 SEGUNDOS
+// =========================
+// ATUALIZAÇÃO AUTOMÁTICA
+// =========================
 
-setInterval(carregarDados, 5000)
+setInterval(async () => {
 
-/* MENU */
+    await carregarDados()
+
+}, 3000)
+
+// =========================
+// MENU
+// =========================
 
 const menuBtn =
     document.getElementById("menuBtn")
@@ -266,24 +296,31 @@ menuBtn.onclick = () => {
     sidebar.classList.toggle("open")
 }
 
-/* TEMA */
+// =========================
+// TEMA
+// =========================
 
 document.getElementById("temaBtn")
     .onclick = () => {
 
-        document.body.classList.toggle("dark")
+        document.body
+            .classList
+            .toggle("dark")
 
         carregarDados()
     }
 
-/* NAVEGAÇÃO */
+// =========================
+// NAVEGAÇÃO
+// =========================
 
 document.querySelectorAll(".nav-btn")
     .forEach(btn => {
 
         btn.onclick = () => {
 
-            document.querySelectorAll(".nav-btn")
+            document
+                .querySelectorAll(".nav-btn")
                 .forEach(b =>
                     b.classList.remove("active")
                 )
@@ -293,17 +330,21 @@ document.querySelectorAll(".nav-btn")
             const page =
                 btn.dataset.page
 
-            document.querySelectorAll(".page")
+            document
+                .querySelectorAll(".page")
                 .forEach(p =>
                     p.classList.remove("active")
                 )
 
-            document.getElementById(page)
+            document
+                .getElementById(page)
                 .classList.add("active")
         }
     })
 
-/* COMPARATIVO */
+// =========================
+// COMPARATIVO
+// =========================
 
 document.getElementById("btnComparar")
     .onclick = carregarComparativo
