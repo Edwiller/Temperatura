@@ -1,101 +1,85 @@
 import { supabase } from "./supabase.js"
 
+const TIMEZONE = "America/Rio_Branco"
+
 let graficoComparativo = null
 
-export async function carregarComparativo(){
+export async function carregarComparativo() {
 
-const valor =
-document.getElementById("intervalo").value
+    const valor = document.getElementById("intervalo").value
 
-if(!valor.includes(" até ")){
+    if (!valor.includes(" até ")) {
+        alert("Selecione um intervalo")
+        return
+    }
 
-alert("Selecione um intervalo")
-return
+    const partes = valor.split(" até ")
 
-}
+    const inicio = partes[0].split("/").reverse().join("-")
+    const fim = partes[1].split("/").reverse().join("-")
 
-const partes =
-valor.split(" até ")
+    if (!inicio || !fim) {
+        alert("Selecione o período")
+        return
+    }
 
-const inicio =
-partes[0]
-.split("/")
-.reverse()
-.join("-")
+    // BUSCA COM OFFSET FIXO -05:00 DO ACRE
+    const inicioISO = new Date(inicio + "T00:00:00-05:00").toISOString()
+    const fimISO = new Date(fim + "T23:59:59-05:00").toISOString()
 
-const fim =
-partes[1]
-.split("/")
-.reverse()
-.join("-")
+    const { data, error } = await supabase
+        .from("temperaturas")
+        .select("*")
+        .gte("data", inicioISO)
+        .lte("data", fimISO)
+        .order("data")
 
-if(!inicio || !fim){
-alert("Selecione o período")
-return
-}
+    if (error) {
+        console.log(error)
+        return
+    }
 
-const { data, error } = await supabase
-.from("temperaturas")
-.select("*")
-.gte("data", inicio)
-.lte("data", fim + "T23:59:59")
-.order("data")
+    if (!data.length) {
+        alert("Sem dados nesse período")
+        return
+    }
 
-if(error){
-console.log(error)
-return
-}
+    const valores = data.map(d => d.valor)
 
-if(!data.length){
-alert("Sem dados nesse período")
-return
-}
+    const maior = Math.max(...valores)
+    const menor = Math.min(...valores)
+    const media = (
+        valores.reduce((a, b) => a + b, 0) / valores.length
+    ).toFixed(2)
 
-const valores = data.map(d => d.valor)
+    document.getElementById("maiorTemp").innerHTML = `${maior.toFixed(2)}°C`
+    document.getElementById("menorTemp").innerHTML = `${menor.toFixed(2)}°C`
+    document.getElementById("mediaTemp").innerHTML = `${media}°C`
 
-const maior = Math.max(...valores)
-const menor = Math.min(...valores)
+    const ctx = document.getElementById("graficoComparativo")
 
-const media = (
-valores.reduce((a,b)=>a+b,0)
-/
-valores.length
-).toFixed(2)
+    if (graficoComparativo) graficoComparativo.destroy()
 
-document.getElementById("maiorTemp").innerHTML =
-`${maior.toFixed(2)}°C`
-
-document.getElementById("menorTemp").innerHTML =
-`${menor.toFixed(2)}°C`
-
-document.getElementById("mediaTemp").innerHTML =
-`${media}°C`
-
-const ctx =
-document.getElementById("graficoComparativo")
-
-if(graficoComparativo){
-graficoComparativo.destroy()
-}
-
-graficoComparativo = new Chart(ctx,{
-type:"line",
-data:{
-labels:data.map(d=>
-new Date(d.data).toLocaleDateString("pt-BR")
-),
-datasets:[{
-label:"Temperatura",
-data:valores,
-borderColor:"#2563eb",
-backgroundColor:"rgba(37,99,235,.2)",
-fill:true,
-tension:.4
-}]
-},
-options:{
-responsive:true
-}
-})
-
+    graficoComparativo = new Chart(ctx, {
+        type: "line",
+        data: {
+            // + "Z" força UTC, timeZone converte para o Acre
+            labels: data.map(d =>
+                new Date(d.data + "-03:00").toLocaleDateString("pt-BR", {
+                    timeZone: "America/Rio_Branco"
+                })
+            ),
+            datasets: [{
+                label: "Temperatura",
+                data: valores,
+                borderColor: "#2563eb",
+                backgroundColor: "rgba(37,99,235,.2)",
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    })
 }

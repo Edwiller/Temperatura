@@ -5,28 +5,20 @@ export function filtrarDadosGrafico(data) {
     }
 
     const resultado = []
-
     let ultimoValor = null
-
     let ultimoHorario = null
 
     data.forEach(item => {
 
-        const dataAtual =
-            new Date(item.data)
-
-        const valorAtual =
-            Number(item.valor)
+        // + "Z" força interpretação como UTC
+        const dataAtual = new Date(item.data + "-03:00")
+        const valorAtual = Number(item.valor)
 
         // PRIMEIRO ITEM
         if (ultimoValor === null) {
-
             resultado.push(item)
-
             ultimoValor = valorAtual
-
             ultimoHorario = dataAtual
-
             return
         }
 
@@ -36,21 +28,15 @@ export function filtrarDadosGrafico(data) {
 
         // SE MUDOU VALOR → ADICIONA
         if (valorAtual !== ultimoValor) {
-
             resultado.push(item)
-
             ultimoValor = valorAtual
-
             ultimoHorario = dataAtual
-
             return
         }
 
         // SE PASSOU 3 MIN → ADICIONA
         if (diferencaMinutos >= 3) {
-
             resultado.push(item)
-
             ultimoHorario = dataAtual
         }
     })
