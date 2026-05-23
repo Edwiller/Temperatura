@@ -14,7 +14,6 @@ export async function carregarComparativo() {
     }
 
     const partes = valor.split(" até ")
-
     const inicio = partes[0].split("/").reverse().join("-")
     const fim = partes[1].split("/").reverse().join("-")
 
@@ -23,7 +22,7 @@ export async function carregarComparativo() {
         return
     }
 
-    // BUSCA COM OFFSET FIXO -05:00 DO ACRE
+    // intervalo no fuso do Acre (UTC-5)
     const inicioISO = new Date(inicio + "T00:00:00-05:00").toISOString()
     const fimISO = new Date(fim + "T23:59:59-05:00").toISOString()
 
@@ -35,39 +34,33 @@ export async function carregarComparativo() {
         .order("data")
 
     if (error) {
-        console.log(error)
+        console.error("Erro Supabase:", error)
         return
     }
 
-    if (!data.length) {
+    if (!data || !data.length) {
         alert("Sem dados nesse período")
         return
     }
 
-    const valores = data.map(d => d.valor)
-
+    const valores = data.map(d => Number(d.valor))
     const maior = Math.max(...valores)
     const menor = Math.min(...valores)
-    const media = (
-        valores.reduce((a, b) => a + b, 0) / valores.length
-    ).toFixed(2)
+    const media = (valores.reduce((a, b) => a + b, 0) / valores.length).toFixed(2)
 
     document.getElementById("maiorTemp").innerHTML = `${maior.toFixed(2)}°C`
     document.getElementById("menorTemp").innerHTML = `${menor.toFixed(2)}°C`
     document.getElementById("mediaTemp").innerHTML = `${media}°C`
 
     const ctx = document.getElementById("graficoComparativo")
-
     if (graficoComparativo) graficoComparativo.destroy()
 
     graficoComparativo = new Chart(ctx, {
         type: "line",
         data: {
-            // + "Z" força UTC, timeZone converte para o Acre
             labels: data.map(d =>
-                new Date(d.data + "-03:00").toLocaleDateString("pt-BR", {
-                    timeZone: "America/Rio_Branco"
-                })
+                new Date(d.data.replace(" ", "T") + "-03:00")
+                    .toLocaleDateString("pt-BR", { timeZone: TIMEZONE })
             ),
             datasets: [{
                 label: "Temperatura",
@@ -79,7 +72,8 @@ export async function carregarComparativo() {
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            maintainAspectRatio: false
         }
     })
 }

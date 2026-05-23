@@ -3,39 +3,13 @@ import { carregarComparativo } from "./comparativo.js"
 import { filtrarDadosGrafico } from "./chart.js"
 
 const ctx = document.getElementById("graficoTemperatura")
+const TIMEZONE = "America/Rio_Branco"
 
 let grafico = null
 let ultimoRegistro = null
 
 // =========================
-// NTP — HORÁRIO DO ACRE
-// =========================
-
-const TIMEZONE = "America/Rio_Branco"
-let ntpOffset = 0
-
-async function syncNTP() {
-    try {
-        const t0 = Date.now()
-        const res = await fetch(
-            "https://worldtimeapi.org/api/timezone/America/Rio_Branco"
-        )
-        const data = await res.json()
-        const latency = Math.round((Date.now() - t0) / 2)
-        ntpOffset = data.unixtime * 1000 - Date.now() + latency
-        atualizarStatusNTP("sync")
-    } catch (e) {
-        console.warn("Falha ao sincronizar NTP, usando relógio local.", e)
-        atualizarStatusNTP("error")
-    }
-}
-
-function getNTPDate() {
-    return new Date(Date.now() + ntpOffset)
-}
-
-// =========================
-// RELÓGIO NO FRONT-END
+// RELÓGIO
 // =========================
 
 function iniciarRelogio() {
@@ -43,7 +17,7 @@ function iniciarRelogio() {
     if (!el) return
 
     setInterval(() => {
-        el.textContent = getNTPDate().toLocaleTimeString("pt-BR", {
+        el.textContent = new Date().toLocaleTimeString("pt-BR", {
             timeZone: TIMEZONE,
             hour: "2-digit",
             minute: "2-digit",
@@ -53,24 +27,17 @@ function iniciarRelogio() {
     }, 1000)
 }
 
-function atualizarStatusNTP(estado) {
-    const el = document.getElementById("statusNTP")
-    if (!el) return
-    el.textContent = estado === "sync" ? "🟢 NTP sincronizado" : "🔴 Relógio local"
-}
-
 // =========================
-// CARREGAMENTO DE DADOS
+// CARREGAR DADOS
 // =========================
 
 async function carregarDados() {
 
-    const hoje = getNTPDate()
+    const hoje = new Date()
+    const dataAcre = hoje.toLocaleDateString("en-CA", { timeZone: TIMEZONE })
 
-    const dataAcre = hoje.toLocaleDateString("en-CA", {
-        timeZone: TIMEZONE
-    })
-
+    // banco salva em horário de Brasília (UTC-3)
+    // intervalo do dia no Acre (UTC-5)
     const inicioHoje = new Date(dataAcre + "T00:00:00-05:00")
     const fimHoje = new Date(dataAcre + "T23:59:59-05:00")
 
@@ -85,7 +52,7 @@ async function carregarDados() {
         .order("data", { ascending: true })
 
     if (error) {
-        console.log(error)
+        console.error("Erro Supabase:", error)
         return
     }
 
@@ -93,12 +60,12 @@ async function carregarDados() {
 
     const ultimoAtual = data[data.length - 1].id
 
+    // só re-renderiza se chegou dado novo
     if (ultimoRegistro === ultimoAtual) return
-
     ultimoRegistro = ultimoAtual
 
     const filtrado = filtrarDadosGrafico(data)
-    const valores = filtrado.map(i => i.valor)
+    const valores = filtrado.map(i => Number(i.valor))
 
     // =========================
     // CARDS
@@ -114,20 +81,22 @@ async function carregarDados() {
         `${Math.min(...valores).toFixed(2)}°C`
 
     // =========================
-    // LABELS — HORÁRIO NO FUSO DO ACRE
-    // + "Z" força interpretação como UTC
+    // LABELS
+    // banco salva sem timezone (Brasília UTC-3)
+    // replace(" ","T") + "-03:00" → converte para UTC → exibe no Acre
     // =========================
 
     const labels = filtrado.map(item =>
-        new Date(item.data + "-03:00").toLocaleTimeString("pt-BR", {
-            timeZone: TIMEZONE,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        })
+        new Date(item.data.replace(" ", "T") + "-03:00")
+            .toLocaleTimeString("pt-BR", {
+                timeZone: TIMEZONE,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            })
     )
 
-    const valoresGrafico = filtrado.map(item => item.valor)
+    const valoresGrafico = filtrado.map(item => Number(item.valor))
 
     if (grafico) grafico.destroy()
 
@@ -158,10 +127,7 @@ async function carregarDados() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: "index"
-            },
+            interaction: { intersect: false, mode: "index" },
             plugins: {
                 legend: {
                     labels: {
@@ -203,10 +169,7 @@ flatpickr("#intervalo", {
 // INICIALIZAÇÃO
 // =========================
 
-await syncNTP()
 iniciarRelogio()
-setInterval(syncNTP, 5 * 60 * 1000)
-
 carregarDados()
 setInterval(carregarDados, 3000)
 
@@ -224,6 +187,7 @@ document.getElementById("menuBtn").onclick = () => {
 
 document.getElementById("temaBtn").onclick = () => {
     document.body.classList.toggle("dark")
+    ultimoRegistro = null  // força re-render com as cores novas
     carregarDados()
 }
 
@@ -235,14 +199,11 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
     btn.onclick = () => {
         document.querySelectorAll(".nav-btn")
             .forEach(b => b.classList.remove("active"))
-
         btn.classList.add("active")
 
         const page = btn.dataset.page
-
         document.querySelectorAll(".page")
             .forEach(p => p.classList.remove("active"))
-
         document.getElementById(page).classList.add("active")
     }
 })

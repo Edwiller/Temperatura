@@ -1,8 +1,6 @@
 export function filtrarDadosGrafico(data) {
 
-    if (!data || data.length === 0) {
-        return []
-    }
+    if (!data || data.length === 0) return []
 
     const resultado = []
     let ultimoValor = null
@@ -10,11 +8,10 @@ export function filtrarDadosGrafico(data) {
 
     data.forEach(item => {
 
-        // + "Z" força interpretação como UTC
-        const dataAtual = new Date(item.data + "-03:00")
+        // banco salva sem timezone (Brasília UTC-3)
+        const dataAtual = new Date(item.data.replace(" ", "T") + "-03:00")
         const valorAtual = Number(item.valor)
 
-        // PRIMEIRO ITEM
         if (ultimoValor === null) {
             resultado.push(item)
             ultimoValor = valorAtual
@@ -22,11 +19,8 @@ export function filtrarDadosGrafico(data) {
             return
         }
 
-        // DIFERENÇA EM MINUTOS
-        const diferencaMinutos =
-            (dataAtual - ultimoHorario) / 1000 / 60
+        const diferencaMinutos = (dataAtual - ultimoHorario) / 1000 / 60
 
-        // SE MUDOU VALOR → ADICIONA
         if (valorAtual !== ultimoValor) {
             resultado.push(item)
             ultimoValor = valorAtual
@@ -34,7 +28,6 @@ export function filtrarDadosGrafico(data) {
             return
         }
 
-        // SE PASSOU 3 MIN → ADICIONA
         if (diferencaMinutos >= 3) {
             resultado.push(item)
             ultimoHorario = dataAtual

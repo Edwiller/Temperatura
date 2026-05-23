@@ -12,18 +12,27 @@ body {
     min-height: 100vh;
 }
 
-/* SIDEBAR */
+/* =========================
+   SIDEBAR
+========================= */
 
 .sidebar {
     width: 250px;
+    min-height: 100vh;
     background: #0b1f3a;
     color: white;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     transition: .3s;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, .15);
 }
 
 .sidebar h2 {
-    margin-bottom: 30px;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .sidebar nav {
@@ -41,6 +50,10 @@ body {
     cursor: pointer;
     text-align: left;
     font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     transition: .3s;
 }
 
@@ -49,7 +62,35 @@ body {
     background: #2563eb;
 }
 
-/* MENU MOBILE */
+/* =========================
+   RELÓGIO
+========================= */
+
+.relogio-box {
+    margin-top: auto;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+}
+
+#relogioNTP {
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    color: white;
+}
+
+#statusNTP {
+    font-size: 12px;
+    opacity: 0.6;
+    color: white;
+}
+
+/* =========================
+   MENU MOBILE
+========================= */
 
 .menu-btn {
     display: none;
@@ -64,18 +105,31 @@ body {
     border-radius: 10px;
     font-size: 20px;
     cursor: pointer;
+    box-shadow: 0 5px 15px rgba(37, 99, 235, .4);
+    transition: .3s;
 }
 
-/* CONTENT */
+.menu-btn:hover {
+    transform: scale(1.05);
+}
+
+/* =========================
+   CONTEÚDO
+========================= */
 
 .content {
     flex: 1;
     padding: 30px;
+    overflow-x: hidden;
 }
 
 .card-title {
     margin-bottom: 20px;
 }
+
+/* =========================
+   CARDS
+========================= */
 
 .cards {
     display: grid;
@@ -89,6 +143,12 @@ body {
     padding: 25px;
     border-radius: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+    transition: .3s;
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
 }
 
 .info-card h3 {
@@ -101,6 +161,10 @@ body {
     font-weight: bold;
 }
 
+/* =========================
+   GRÁFICO
+========================= */
+
 .grafico-card {
     background: white;
     padding: 20px;
@@ -108,7 +172,15 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
 }
 
-/* COMPARATIVO */
+.grafico-wrapper {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+/* =========================
+   COMPARATIVO
+========================= */
 
 .comparativo-box {
     display: flex;
@@ -117,22 +189,38 @@ body {
     flex-wrap: wrap;
 }
 
-.comparativo-box input,
-.comparativo-box button {
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-}
-
 .comparativo-box button {
     background: #2563eb;
     color: white;
     border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 16px;
     cursor: pointer;
+    transition: .3s;
 }
 
-/* PAGES */
+.comparativo-box button:hover {
+    background: #1d4ed8;
+}
+
+/* =========================
+   CALENDÁRIO
+========================= */
+
+.calendario {
+    background: white;
+    border: 1px solid #dbeafe;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 16px;
+    min-width: 260px;
+    color: #111;
+}
+
+/* =========================
+   PÁGINAS
+========================= */
 
 .page {
     display: none;
@@ -142,7 +230,50 @@ body {
     display: block;
 }
 
-/* DARK MODE */
+/* =========================
+   FLATPICKR
+========================= */
+
+.flatpickr-calendar {
+    background: #0f172a !important;
+    border: none !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+}
+
+.flatpickr-day {
+    color: white !important;
+}
+
+.flatpickr-current-month input.cur-year {
+    color: white !important;
+}
+
+.flatpickr-monthDropdown-months {
+    color: white !important;
+    background: #0f172a !important;
+}
+
+.flatpickr-weekday {
+    color: #60a5fa !important;
+}
+
+.flatpickr-day.selected {
+    background: #2563eb !important;
+    border: none !important;
+}
+
+.flatpickr-day:hover {
+    background: #1e40af !important;
+}
+
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg {
+    fill: white !important;
+}
+
+/* =========================
+   DARK MODE
+========================= */
 
 .dark {
     background: #07111f;
@@ -159,15 +290,31 @@ body {
     color: white;
 }
 
-.dark input {
+.dark .sidebar {
+    background: #081426;
+}
+
+.dark .sidebar button:hover,
+.dark .sidebar .active {
+    background: #1d4ed8;
+}
+
+.dark .calendario {
     background: #0f172a;
     color: white;
     border: 1px solid #334155;
 }
 
-/* MOBILE */
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
 
-@media(max-width:768px) {
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
 
     .menu-btn {
         display: block;
@@ -186,289 +333,14 @@ body {
     }
 
     .content {
-        padding: 80px 15px;
+        padding: 80px 15px 30px;
     }
 
-    /* INPUT DATE DARK MODE */
-
-    .dark input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        cursor: pointer;
+    .cards {
+        grid-template-columns: 1fr;
     }
 
-    /* FLATPICKR */
-
-    .calendario {
-        background: #0f172a;
-        color: white;
-
-        border: none;
-
-        padding: 14px 18px;
-
-        border-radius: 12px;
-
-        font-size: 16px;
-
-        min-width: 260px;
+    .grafico-wrapper {
+        height: 280px;
     }
-
-    .flatpickr-calendar {
-        background: #0f172a !important;
-        border: none !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
-    }
-
-    .flatpickr-day {
-        color: white !important;
-    }
-
-    .flatpickr-current-month input.cur-year {
-        color: white !important;
-    }
-
-    .flatpickr-monthDropdown-months {
-        color: white !important;
-        background: #0f172a !important;
-    }
-
-    .flatpickr-weekday {
-        color: #60a5fa !important;
-    }
-
-    .flatpickr-day.selected {
-        background: #2563eb !important;
-        border: none !important;
-    }
-
-    .flatpickr-day:hover {
-        background: #1e40af !important;
-    }
-
-    .flatpickr-prev-month svg,
-    .flatpickr-next-month svg {
-        fill: white !important;
-    }
-
-
-    /* =========================
-   GRÁFICO
-========================= */
-
-    .grafico-card {
-
-        height: 500px;
-
-        position: relative;
-    }
-
-    #graficoTemperatura {
-
-        width: 100% !important;
-
-        height: 100% !important;
-    }
-
-    /* =========================
-   SIDEBAR MODERNA
-========================= */
-
-    .sidebar {
-
-        display: flex;
-
-        flex-direction: column;
-
-        justify-content: flex-start;
-
-        gap: 20px;
-
-        box-shadow: 4px 0 20px rgba(0, 0, 0, .15);
-    }
-
-    .sidebar h2 {
-
-        font-size: 24px;
-
-        font-weight: bold;
-
-        margin-bottom: 10px;
-    }
-
-    .sidebar button {
-
-        display: flex;
-
-        align-items: center;
-
-        gap: 12px;
-
-        font-weight: 600;
-    }
-
-    /* =========================
-   MENU MOBILE
-========================= */
-
-    .menu-btn {
-
-        box-shadow: 0 5px 15px rgba(37, 99, 235, .4);
-
-        transition: .3s;
-    }
-
-    .menu-btn:hover {
-
-        transform: scale(1.05);
-    }
-
-    /* =========================
-   CARDS
-========================= */
-
-    .info-card {
-
-        transition: .3s;
-    }
-
-    .info-card:hover {
-
-        transform: translateY(-4px);
-
-        box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
-    }
-
-    /* =========================
-   DARK MODE
-========================= */
-
-    .dark .sidebar {
-
-        background: #081426;
-    }
-
-    .dark .sidebar button:hover,
-    .dark .sidebar .active {
-
-        background: #1d4ed8;
-    }
-
-    /* =========================
-   INPUT CALENDÁRIO
-========================= */
-
-    .calendario {
-
-        background: white;
-
-        border: 1px solid #dbeafe;
-
-        padding: 14px 18px;
-
-        border-radius: 12px;
-
-        font-size: 16px;
-
-        min-width: 260px;
-    }
-
-    .dark .calendario {
-
-        background: #0f172a;
-
-        color: white;
-
-        border: 1px solid #334155;
-    }
-
-    /* ÍCONE BRANCO */
-
-    .dark input[type="date"]::-webkit-calendar-picker-indicator {
-
-        filter: invert(1);
-
-        cursor: pointer;
-    }
-
-    /* =========================
-   FLATPICKR
-========================= */
-
-    .dark .flatpickr-calendar {
-
-        background: #0f172a !important;
-
-        border: none !important;
-    }
-
-    .dark .flatpickr-day {
-
-        color: white !important;
-    }
-
-    .dark .flatpickr-current-month input.cur-year {
-
-        color: white !important;
-    }
-
-    .dark .flatpickr-monthDropdown-months {
-
-        background: #0f172a !important;
-
-        color: white !important;
-    }
-
-    .dark .flatpickr-weekday {
-
-        color: #60a5fa !important;
-    }
-
-    .dark .flatpickr-day.selected {
-
-        background: #2563eb !important;
-
-        border: none !important;
-    }
-
-    .dark .flatpickr-prev-month svg,
-    .dark .flatpickr-next-month svg {
-
-        fill: white !important;
-    }
-
-    /* =========================
-   MOBILE
-========================= */
-
-    @media(max-width:768px) {
-
-        .sidebar {
-
-            position: fixed;
-
-            left: -260px;
-
-            top: 0;
-
-            height: 100%;
-
-            z-index: 999;
-        }
-
-        .sidebar.open {
-
-            left: 0;
-        }
-
-        .content {
-
-            padding: 80px 15px;
-        }
-
-        .cards {
-
-            grid-template-columns: 1fr;
-        }
-    }
-
 }
