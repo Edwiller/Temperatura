@@ -1,269 +1,124 @@
+/*
+  style.css — complemento ao Tailwind
+  Apenas o que o Tailwind não cobre nativamente
+*/
+
+/* ── Fonte base ───────────────────────────────── */
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: Arial;
 }
 
 body {
-    display: flex;
-    background: #f4f7fb;
-    color: #111;
-    min-height: 100vh;
+    font-family: 'Sora', sans-serif;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
-
-.sidebar {
-    width: 250px;
-    min-height: 100vh;
-    background: #0b1f3a;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: .3s;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, .15);
+/* ── Scrollbar fina ───────────────────────────── */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
 }
 
-.sidebar h2 {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 10px;
+::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-.sidebar nav {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+::-webkit-scrollbar-thumb {
+    background: #3b6ef530;
+    border-radius: 99px;
 }
 
-.sidebar button {
-    background: none;
-    border: none;
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: left;
-    font-size: 16px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: .3s;
+/* ── DM Mono para valores numéricos ──────────── */
+.temp-value {
+    font-family: 'DM Mono', monospace;
 }
 
-.sidebar button:hover,
-.sidebar .active {
-    background: #2563eb;
+/* ── Sidebar transition ───────────────────────── */
+#sidebar {
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
 }
 
-/* =========================
-   RELÓGIO
-========================= */
-
-.relogio-box {
-    margin-top: auto;
-    padding-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    border-top: 1px solid rgba(255, 255, 255, .1);
-}
-
-#relogioNTP {
-    font-size: 22px;
-    font-weight: bold;
-    letter-spacing: 0.05em;
-    color: white;
-}
-
-#statusNTP {
-    font-size: 12px;
-    opacity: 0.6;
-    color: white;
-}
-
-/* =========================
-   MENU MOBILE
-========================= */
-
-.menu-btn {
-    display: none;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1000;
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(37, 99, 235, .4);
-    transition: .3s;
-}
-
-.menu-btn:hover {
-    transform: scale(1.05);
-}
-
-/* =========================
-   CONTEÚDO
-========================= */
-
-.content {
-    flex: 1;
-    padding: 30px;
-    overflow-x: hidden;
-}
-
-.card-title {
-    margin-bottom: 20px;
-}
-
-/* =========================
-   CARDS
-========================= */
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
+/* ── Card hover suave ─────────────────────────── */
 .info-card {
-    background: white;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
-    transition: .3s;
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .info-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+    transform: translateY(-3px);
 }
 
-.info-card h3 {
-    margin-bottom: 10px;
-    color: #2563eb;
+/* ── Nav ativo ────────────────────────────────── */
+.nav-btn {
+    transition: background .15s ease, color .15s ease;
 }
 
-.info-card p {
-    font-size: 30px;
-    font-weight: bold;
+.nav-btn.active {
+    background: #3b6ef5;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(59, 110, 245, .25);
 }
 
-/* =========================
-   GRÁFICO
-========================= */
+/* ── Pulse status online ──────────────────────── */
+@keyframes pulse-dot {
 
-.grafico-card {
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .25;
+    }
 }
 
-.grafico-wrapper {
-    position: relative;
-    height: 400px;
-    width: 100%;
+.pulse {
+    animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* =========================
-   COMPARATIVO
-========================= */
-
-.comparativo-box {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.comparativo-box button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: .3s;
-}
-
-.comparativo-box button:hover {
-    background: #1d4ed8;
-}
-
-/* =========================
-   CALENDÁRIO
-========================= */
-
-.calendario {
-    background: white;
-    border: 1px solid #dbeafe;
-    padding: 14px 18px;
-    border-radius: 12px;
-    font-size: 16px;
-    min-width: 260px;
-    color: #111;
-}
-
-/* =========================
-   PÁGINAS
-========================= */
-
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
-/* =========================
-   FLATPICKR
-========================= */
-
+/* ── Flatpickr dark override ──────────────────── */
 .flatpickr-calendar {
     background: #0f172a !important;
-    border: none !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+    border: 1px solid #1e293b !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .45) !important;
+    border-radius: 14px !important;
 }
 
 .flatpickr-day {
-    color: white !important;
+    color: #e2e8f0 !important;
+    border-radius: 8px !important;
 }
 
-.flatpickr-current-month input.cur-year {
-    color: white !important;
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: #3b6ef5 !important;
+    border-color: #3b6ef5 !important;
 }
 
-.flatpickr-monthDropdown-months {
-    color: white !important;
-    background: #0f172a !important;
-}
-
-.flatpickr-weekday {
-    color: #60a5fa !important;
-}
-
-.flatpickr-day.selected {
-    background: #2563eb !important;
-    border: none !important;
+.flatpickr-day.inRange {
+    background: #3b6ef520 !important;
+    border-color: transparent !important;
 }
 
 .flatpickr-day:hover {
     background: #1e40af !important;
+}
+
+.flatpickr-current-month input.cur-year,
+.flatpickr-monthDropdown-months {
+    color: white !important;
+    background: transparent !important;
+}
+
+.flatpickr-weekday {
+    color: #60a5fa !important;
+    font-weight: 600;
+}
+
+.flatpickr-months .flatpickr-month {
+    color: white !important;
+    fill: white !important;
 }
 
 .flatpickr-prev-month svg,
@@ -271,76 +126,8 @@ body {
     fill: white !important;
 }
 
-/* =========================
-   DARK MODE
-========================= */
-
-.dark {
-    background: #07111f;
-    color: white;
-}
-
-.dark .content {
-    background: #07111f;
-}
-
-.dark .info-card,
-.dark .grafico-card {
-    background: #0f172a;
-    color: white;
-}
-
-.dark .sidebar {
-    background: #081426;
-}
-
-.dark .sidebar button:hover,
-.dark .sidebar .active {
-    background: #1d4ed8;
-}
-
-.dark .calendario {
-    background: #0f172a;
-    color: white;
-    border: 1px solid #334155;
-}
-
-.dark input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 768px) {
-
-    .menu-btn {
-        display: block;
-    }
-
-    .sidebar {
-        position: fixed;
-        left: -260px;
-        top: 0;
-        height: 100%;
-        z-index: 999;
-    }
-
-    .sidebar.open {
-        left: 0;
-    }
-
-    .content {
-        padding: 80px 15px 30px;
-    }
-
-    .cards {
-        grid-template-columns: 1fr;
-    }
-
-    .grafico-wrapper {
-        height: 280px;
-    }
+/* ── Chart.js tooltip ─────────────────────────── */
+.chartjs-tooltip {
+    font-family: 'DM Mono', monospace !important;
+    font-size: 13px !important;
 }

@@ -1,89 +1,343 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Temperatura</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sora', 'sans-serif'],
+                        mono: ['DM Mono', 'monospace'],
+                    },
+                    colors: {
+                        accent: '#3b6ef5',
+                        'accent-dark': '#2a54c7',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js" defer></script>
+    <script type="module" src="main.js" defer></script>
+
+    <style>
+        body {
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* Scrollbar fina */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3b6ef520;
+            border-radius: 99px;
+        }
+
+        /* Sidebar slide mobile */
+        #sidebar {
+            transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        /* Card hover */
+        .info-card {
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Glow azul no card ativo */
+        .nav-btn.active {
+            background: #3b6ef5;
+            color: #fff;
+            box-shadow: 0 4px 16px #3b6ef530;
+        }
+
+        /* Flatpickr override */
+        .flatpickr-calendar {
+            background: #0f172a !important;
+            border: 1px solid #1e293b !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .4) !important;
+            border-radius: 12px !important;
+        }
+
+        .flatpickr-day {
+            color: #e2e8f0 !important;
+            border-radius: 8px !important;
+        }
+
+        .flatpickr-day.selected {
+            background: #3b6ef5 !important;
+            border-color: #3b6ef5 !important;
+        }
+
+        .flatpickr-day:hover {
+            background: #1e40af !important;
+        }
+
+        .flatpickr-current-month input.cur-year,
+        .flatpickr-monthDropdown-months {
+            color: white !important;
+            background: transparent !important;
+        }
+
+        .flatpickr-weekday {
+            color: #60a5fa !important;
+        }
+
+        .flatpickr-prev-month svg,
+        .flatpickr-next-month svg {
+            fill: white !important;
+        }
+
+        /* Pulse no status online */
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .3;
+            }
+        }
+
+        .pulse {
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        /* Número grande da temperatura */
+        .temp-value {
+            font-family: 'DM Mono', monospace;
+        }
+    </style>
 </head>
 
-<body>
+<body
+    class="bg-slate-100 dark:bg-[#07111f] text-slate-800 dark:text-slate-100 min-h-screen flex transition-colors duration-300">
 
-    <button class="menu-btn" id="menuBtn">☰</button>
+    <!-- Overlay mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="fecharMenu()"></div>
 
-    <aside class="sidebar" id="sidebar">
-        <h2>🌡 Dashboard</h2>
-        <nav>
-            <button class="nav-btn active" data-page="tempo">📈 Tempo Real</button>
-            <button class="nav-btn" data-page="comparativo">📊 Comparativo</button>
-            <button id="temaBtn">🌙 Tema</button>
+    <!-- Botão menu mobile -->
+    <button id="menuBtn"
+        class="md:hidden fixed top-4 left-4 z-50 bg-accent text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-accent/30 transition hover:scale-105 active:scale-95"
+        onclick="abrirMenu()" aria-label="Abrir menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed md:static top-0 left-0 h-full md:h-auto w-64 z-50 md:z-auto
+               bg-[#0b1f3a] dark:bg-[#060f1e] text-white
+               flex flex-col gap-3 p-5
+               shadow-2xl md:shadow-none
+               -translate-x-full md:translate-x-0">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-2 mb-2 pb-4 border-b border-white/10">
+            <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-sm">🌡</div>
+            <h2 class="text-lg font-bold tracking-tight">Dashboard</h2>
+        </div>
+
+        <!-- Nav -->
+        <nav class="flex flex-col gap-2">
+            <button
+                class="nav-btn active flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-accent/80 text-left"
+                data-page="tempo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+                Tempo Real
+            </button>
+            <button
+                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-white/10 text-left"
+                data-page="comparativo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="4" height="18" rx="1" />
+                    <rect x="10" y="8" width="4" height="13" rx="1" />
+                    <rect x="18" y="13" width="4" height="8" rx="1" />
+                </svg>
+                Comparativo
+            </button>
         </nav>
-        <div class="relogio-box">
-            <span id="relogioNTP">--:--:--</span>
-            <span id="statusNTP">⏳ Sincronizando...</span>
+
+        <!-- Spacer -->
+        <div class="flex-1"></div>
+
+        <!-- Tema -->
+        <button id="temaBtn"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-white/10 text-left w-full">
+            <span id="temaIcon">🌙</span>
+            <span id="temaLabel">Tema Escuro</span>
+        </button>
+
+        <!-- Relógio -->
+        <div class="border-t border-white/10 pt-4 mt-1">
+            <div class="flex items-center gap-2 text-xs text-white/50 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Horário — Acre (UTC-5)
+            </div>
+            <span id="relogioNTP" class="temp-value text-2xl font-medium tracking-widest text-white">--:--:--</span>
+            <div class="flex items-center gap-1.5 mt-1">
+                <span class="pulse w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                <span id="statusNTP" class="text-xs text-white/40">Sincronizando...</span>
+            </div>
         </div>
     </aside>
 
-    <main class="content">
+    <!-- CONTEÚDO -->
+    <main class="flex-1 p-6 md:p-8 overflow-x-hidden">
 
-        <section id="tempo" class="page active">
-            <div class="card-title">
-                <h1 id="tituloHoje">Temperatura</h1>
-                <p>Monitoramento em tempo real</p>
+        <!-- TEMPO REAL -->
+        <section id="tempo" class="page active max-w-6xl mx-auto">
+
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 id="tituloHoje" class="text-2xl font-bold tracking-tight">Temperatura</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Monitoramento em tempo real</p>
             </div>
-            <div class="cards">
-                <div class="info-card">
-                    <h3>🌡 Atual</h3>
-                    <p id="tempAtual">--°C</p>
+
+            <!-- Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+
+                <div
+                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span
+                            class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-sm">🌡</span>
+                        <span
+                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Atual</span>
+                    </div>
+                    <p id="tempAtual" class="temp-value text-3xl font-medium text-slate-800 dark:text-white">--°C</p>
                 </div>
-                <div class="info-card">
-                    <h3>🔥 Máxima</h3>
-                    <p id="tempMax">--°C</p>
+
+                <div
+                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span
+                            class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-sm">🔥</span>
+                        <span
+                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Máxima</span>
+                    </div>
+                    <p id="tempMax" class="temp-value text-3xl font-medium text-red-500">--°C</p>
                 </div>
-                <div class="info-card">
-                    <h3>❄ Mínima</h3>
-                    <p id="tempMin">--°C</p>
+
+                <div
+                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span
+                            class="w-7 h-7 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center text-sm">❄</span>
+                        <span
+                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mínima</span>
+                    </div>
+                    <p id="tempMin" class="temp-value text-3xl font-medium text-cyan-500">--°C</p>
                 </div>
+
             </div>
-            <div class="grafico-card">
-                <div class="grafico-wrapper">
+
+            <!-- Gráfico -->
+            <div
+                class="bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                <div class="relative h-72 md:h-96 w-full">
                     <canvas id="graficoTemperatura"></canvas>
                 </div>
             </div>
         </section>
 
-        <section id="comparativo" class="page">
-            <div class="card-title">
-                <h1>Comparativo</h1>
-                <p>Compare um intervalo completo</p>
+        <!-- COMPARATIVO -->
+        <section id="comparativo" class="page hidden max-w-6xl mx-auto">
+
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold tracking-tight">Comparativo</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Compare um intervalo de datas</p>
             </div>
-            <div class="comparativo-box">
-                <input type="text" id="intervalo" class="calendario" placeholder="Selecione o período">
-                <button id="btnComparar">Comparar</button>
+
+            <!-- Filtro -->
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <input type="text" id="intervalo"
+                    class="bg-white dark:bg-[#0f1f35] border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium min-w-64 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                    placeholder="Selecione o período">
+                <button id="btnComparar"
+                    class="bg-accent hover:bg-accent-dark text-white px-5 py-3 rounded-xl text-sm font-semibold transition shadow-md shadow-accent/20 active:scale-95">
+                    Comparar
+                </button>
             </div>
-            <div class="cards">
-                <div class="info-card">
-                    <h3>🔥 Temperatura mais alta</h3>
-                    <p id="maiorTemp">--°C</p>
+
+            <!-- Cards comparativo -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div
+                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span
+                            class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-sm">🔥</span>
+                        <span
+                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mais
+                            alta</span>
+                    </div>
+                    <p id="maiorTemp" class="temp-value text-3xl font-medium text-red-500">--°C</p>
                 </div>
-                <div class="info-card">
-                    <h3>❄ Temperatura mais baixa</h3>
-                    <p id="menorTemp">--°C</p>
+                <div
+                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span
+                            class="w-7 h-7 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center text-sm">❄</span>
+                        <span
+                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mais
+                            baixa</span>
+                    </div>
+                    <p id="menorTemp" class="temp-value text-3xl font-medium text-cyan-500">--°C</p>
                 </div>
-                <div class="info-card">
-                    <h3>📊 Média</h3>
-                    <p id="mediaTemp">--°C</p>
+                <div
+                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span
+                            class="w-7 h-7 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center text-sm">📊</span>
+                        <span
+                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Média</span>
+                    </div>
+                    <p id="mediaTemp" class="temp-value text-3xl font-medium text-violet-500">--°C</p>
                 </div>
             </div>
-            <div class="grafico-card">
-                <div class="grafico-wrapper">
+
+            <!-- Gráfico comparativo -->
+            <div
+                class="bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                <div class="relative h-72 md:h-96 w-full">
                     <canvas id="graficoComparativo"></canvas>
                 </div>
             </div>
@@ -91,7 +345,56 @@
 
     </main>
 
-    <script type="module" src="main.js"></script>
+    <script>
+        // Menu mobile
+        function abrirMenu() {
+            document.getElementById('sidebar').classList.remove('-translate-x-full')
+            document.getElementById('overlay').classList.remove('hidden')
+        }
+        function fecharMenu() {
+            document.getElementById('sidebar').classList.add('-translate-x-full')
+            document.getElementById('overlay').classList.add('hidden')
+        }
+
+        // Navegação entre páginas
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
+                btn.classList.add('active')
+                const page = btn.dataset.page
+                document.querySelectorAll('.page').forEach(p => {
+                    p.classList.add('hidden')
+                    p.classList.remove('active')
+                })
+                const alvo = document.getElementById(page)
+                alvo.classList.remove('hidden')
+                alvo.classList.add('active')
+                fecharMenu()
+            })
+        })
+
+        // Tema dark/light
+        const html = document.documentElement
+        const temaBtn = document.getElementById('temaBtn')
+        const temaIcon = document.getElementById('temaIcon')
+        const temaLabel = document.getElementById('temaLabel')
+
+        // Detecta preferência do sistema
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            html.classList.add('dark')
+            temaIcon.textContent = '☀️'
+            temaLabel.textContent = 'Tema Claro'
+        }
+
+        temaBtn.addEventListener('click', () => {
+            const isDark = html.classList.toggle('dark')
+            temaIcon.textContent = isDark ? '☀️' : '🌙'
+            temaLabel.textContent = isDark ? 'Tema Claro' : 'Tema Escuro'
+            // força re-render do gráfico com novas cores
+            window.ultimoRegistro = null
+            if (typeof carregarDados === 'function') carregarDados()
+        })
+    </script>
 
 </body>
 

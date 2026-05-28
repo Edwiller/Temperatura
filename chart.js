@@ -1,5 +1,4 @@
 export function filtrarDadosGrafico(data) {
-
     if (!data || data.length === 0) return []
 
     const resultado = []
@@ -7,9 +6,8 @@ export function filtrarDadosGrafico(data) {
     let ultimoHorario = null
 
     data.forEach(item => {
-
-        // banco salva sem timezone (Brasília UTC-3)
-        const dataAtual = new Date(item.data.replace(" ", "T") + "-03:00")
+        // data já está no Acre — sem offset
+        const dataAtual = new Date(item.data.replace(" ", "T"))
         const valorAtual = Number(item.valor)
 
         if (ultimoValor === null) {
