@@ -1,19 +1,17 @@
-export function toggleTema(){
-
-  document.body.classList.toggle("dark")
-
-  const dark =
-    document.body.classList.contains("dark")
-
-  localStorage.setItem("tema", dark ? "dark" : "light")
+export function toggleTema() {
+  const html = document.documentElement
+  const isDark = html.classList.toggle("dark")
+  localStorage.setItem("tema", isDark ? "dark" : "light")
 }
 
-export function carregarTema(){
-
+export function carregarTema() {
   const tema = localStorage.getItem("tema")
-
-  if(tema === "light"){
-    document.body.classList.remove("dark")
+  // Se nada salvo, respeita preferência do sistema
+  if (tema === "dark") {
+    document.documentElement.classList.add("dark")
+  } else if (tema === "light") {
+    document.documentElement.classList.remove("dark")
+  } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    document.documentElement.classList.add("dark")
   }
-
 }
