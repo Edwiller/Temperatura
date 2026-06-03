@@ -6,6 +6,7 @@ const TIMEZONE = "America/Rio_Branco"
 
 let grafico = null
 let ultimoRegistro = null
+let dataSelecionada = null   // null = hoje
 
 // ── Relógio ──────────────────────────────────────
 function iniciarRelogio() {
@@ -22,15 +23,17 @@ function iniciarRelogio() {
 }
 
 // ── Utilitários de data ───────────────────────────
-function inicioDiaAcre() {
-    return new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE }) + " 00:00:00"
-}
-function fimDiaAcre() {
-    return new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE }) + " 23:59:59"
+function getDia() {
+    // Se há data selecionada usa ela, senão pega hoje no Acre
+    return dataSelecionada
+        ?? new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE })
 }
 
+function inicioDia(dia) { return dia + " 00:00:00" }
+function fimDia(dia) { return dia + " 23:59:59" }
+
 // ── Busca TODOS os registros do dia (pagina automaticamente) ──
-async function buscarTodosDia() {
+async function buscarTodosDia(dia) {
     const PAGE = 1000
     let todos = []
     let from = 0
@@ -39,8 +42,8 @@ async function buscarTodosDia() {
         const { data, error } = await supabase
             .from("temperaturas")
             .select("*")
-            .gte("data", inicioDiaAcre())
-            .lte("data", fimDiaAcre())
+            .gte("data", inicioDia(dia))
+            .lte("data", fimDia(dia))
             .order("data", { ascending: true })
             .range(from, from + PAGE - 1)
 
@@ -48,8 +51,7 @@ async function buscarTodosDia() {
         if (!data || data.length === 0) break
 
         todos = todos.concat(data)
-
-        if (data.length < PAGE) break   // última página
+        if (data.length < PAGE) break
         from += PAGE
     }
 
@@ -58,17 +60,26 @@ async function buscarTodosDia() {
 
 // ── Carregar dados ────────────────────────────────
 async function carregarDados() {
-    document.getElementById("tituloHoje").textContent =
-        "Temperatura " + new Date().toLocaleDateString("pt-BR", { timeZone: TIMEZONE })
+    const dia = getDia()
 
-    const data = await buscarTodosDia()
+    // Só bloqueia re-render pelo ultimoRegistro quando estiver no dia de hoje
+    const ehHoje = dia === new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE })
+
+    // Título com a data exibida
+    const [ano, mes, d] = dia.split("-")
+    document.getElementById("tituloHoje").textContent =
+        `Temperatura ${d}/${mes}/${ano}`
+
+    const data = await buscarTodosDia(dia)
     if (!data || data.length === 0) return
 
-    const ultimoAtual = data[data.length - 1].id
-    if (ultimoRegistro === ultimoAtual) return
-    ultimoRegistro = ultimoAtual
+    // Cache só para o dia de hoje (evita re-renders desnecessários)
+    if (ehHoje) {
+        const ultimoAtual = data[data.length - 1].id
+        if (ultimoRegistro === ultimoAtual) return
+        ultimoRegistro = ultimoAtual
+    }
 
-    // ── Todos os valores sem filtro ───────────────
     const valores = data.map(i => Number(i.valor))
 
     document.getElementById("tempAtual").textContent = `${valores[valores.length - 1]?.toFixed(2)}°C`
@@ -85,12 +96,7 @@ async function carregarDados() {
     const isDark = document.documentElement.classList.contains("dark")
     const corTexto = isDark ? "#e2e8f0" : "#334155"
     const corGrid = isDark ? "rgba(255,255,255,.05)" : "rgba(0,0,0,.06)"
-    const dataAcre = new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE })
-
-    // Desabilita pontos quando há muitos registros (evita travamento)
     const muitosDados = dadosGrafico.length > 500
-    const raioNormal = muitosDados ? 0 : 3
-    const raioHover = muitosDados ? 4 : 6
 
     grafico = new Chart(ctx, {
         type: "line",
@@ -103,8 +109,8 @@ async function carregarDados() {
                 fill: true,
                 tension: 0.3,
                 borderWidth: muitosDados ? 1.5 : 2.5,
-                pointRadius: raioNormal,
-                pointHoverRadius: raioHover,
+                pointRadius: muitosDados ? 0 : 3,
+                pointHoverRadius: muitosDados ? 4 : 6,
                 pointBackgroundColor: "#3b6ef5",
                 pointBorderColor: "#ffffff",
                 pointBorderWidth: 1.5
@@ -113,7 +119,7 @@ async function carregarDados() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: muitosDados ? 0 : 400 },  // sem animação em datasets grandes
+            animation: { duration: muitosDados ? 0 : 400 },
             interaction: { intersect: false, mode: "index" },
             plugins: {
                 legend: { labels: { color: corTexto, font: { size: 13, weight: "600" } } }
@@ -121,8 +127,8 @@ async function carregarDados() {
             scales: {
                 x: {
                     type: "time",
-                    min: dataAcre + "T00:00:00",
-                    max: dataAcre + "T23:59:59",
+                    min: dia + "T00:00:00",
+                    max: dia + "T23:59:59",
                     time: { unit: "hour", displayFormats: { hour: "HH:mm" } },
                     ticks: { color: corTexto, maxRotation: 0, maxTicksLimit: 12 },
                     grid: { display: false }
@@ -136,13 +142,28 @@ async function carregarDados() {
     })
 }
 
-// ── Flatpickr ─────────────────────────────────────
+// ── Flatpickr — filtro de dia ─────────────────────
+flatpickr("#filtroData", {
+    locale: "pt",
+    dateFormat: "d/m/Y",
+    maxDate: "today",          // não permite data futura
+    onChange(selectedDates) {
+        if (!selectedDates.length) return
+        const d = selectedDates[0]
+        // converte para "YYYY-MM-DD"
+        dataSelecionada = d.toLocaleDateString("en-CA")
+        ultimoRegistro = null   // força re-render
+        carregarDados()
+    }
+})
+
+// Flatpickr — comparativo (range)
 flatpickr("#intervalo", { mode: "range", locale: "pt", dateFormat: "d/m/Y" })
 
 // ── Init ──────────────────────────────────────────
 iniciarRelogio()
 carregarDados()
-setInterval(carregarDados, 15000)
+setInterval(carregarDados, 15000)   // só atualiza se for hoje
 
 // ── Comparativo ───────────────────────────────────
 document.getElementById("btnComparar").onclick = carregarComparativo
