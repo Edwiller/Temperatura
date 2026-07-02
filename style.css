@@ -1,6 +1,5 @@
 /*
-  style.css — complemento ao Tailwind
-  Apenas o que o Tailwind não cobre nativamente
+  style.css — complemento ao Tailwind + Regras de Impressão de Dados
 */
 
 /* ── Fonte base ───────────────────────────────── */
@@ -25,7 +24,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3b6ef530;
+    background: #3b6ef520;
     border-radius: 99px;
 }
 
@@ -130,4 +129,109 @@ body {
 .chartjs-tooltip {
     font-family: 'DM Mono', monospace !important;
     font-size: 13px !important;
+}
+
+/* ==========================================================================
+   CONFIGURAÇÃO DA PÁGINA DE IMPRESSÃO (FOLHA A4 PORTRAIT/RETRATO)
+   ========================================================================== */
+@media print {
+    @page {
+        size: A4 portrait;
+        /* Retrato para acomodar o gráfico e a tabela abaixo */
+        margin: 15mm;
+    }
+
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Ocultar elementos desnecessários */
+    #sidebar,
+    #menuBtn,
+    #overlay,
+    #filtroData,
+    .flex-wrap,
+    #btnComparar,
+    #intervalo {
+        display: none !important;
+    }
+
+    /* Manter os cards informativos de Máxima/Mínima visíveis e bem alinhados */
+    .cards-container {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .info-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .page {
+        display: none !important;
+    }
+
+    .page.active {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .chart-print-container {
+        width: 100% !important;
+        border: none !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        page-break-inside: avoid;
+        /* Mantém o bloco do gráfico unido */
+    }
+
+    .canvas-wrapper {
+        width: 100% !important;
+        height: 320px !important;
+        /* Altura controlada para caber dados abaixo */
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* Ativar container da tabela apenas na impressão */
+    #tabelaImpressaoContainer {
+        display: block !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #e2e8f0 !important;
+        padding: 6px 10px !important;
+        font-family: 'DM Mono', monospace !important;
+    }
+
+    th {
+        background-color: #f1f5f9 !important;
+        color: #000000 !important;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
 }

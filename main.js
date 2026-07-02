@@ -1,12 +1,41 @@
 import { supabase } from "./supabase.js"
 import { carregarComparativo } from "./comparativo.js"
 
+// ── Injeção da Configuração do Tailwind ───────────
+window.tailwind.config = {
+    darkMode: 'class',
+    theme: {
+        extend: {
+            fontFamily: {
+                sans: ['Sora', 'sans-serif'],
+                mono: ['DM Mono', 'monospace'],
+            },
+            colors: {
+                accent: '#3b6ef5',
+                'accent-dark': '#2a54c7',
+            }
+        }
+    }
+}
+
 const ctx = document.getElementById("graficoTemperatura")
 const TIMEZONE = "America/Rio_Branco"
 
 let grafico = null
 let ultimoRegistro = null
 let dataSelecionada = null   // null = hoje
+let cacheDadosImpressao = [] // Armazena dados completos do dia atual selecionado
+
+// ── Funções de Controle do Menu Mobile ────────────
+function abrirMenu() {
+    document.getElementById('sidebar').classList.remove('-translate-x-full')
+    document.getElementById('overlay').classList.remove('hidden')
+}
+
+function fecharMenu() {
+    document.getElementById('sidebar').classList.add('-translate-x-full')
+    document.getElementById('overlay').classList.add('hidden')
+}
 
 // ── Relógio ──────────────────────────────────────
 function iniciarRelogio() {
@@ -24,15 +53,13 @@ function iniciarRelogio() {
 
 // ── Utilitários de data ───────────────────────────
 function getDia() {
-    // Se há data selecionada usa ela, senão pega hoje no Acre
-    return dataSelecionada
-        ?? new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE })
+    return dataSelecionada ?? new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE })
 }
 
 function inicioDia(dia) { return dia + " 00:00:00" }
 function fimDia(dia) { return dia + " 23:59:59" }
 
-// ── Busca TODOS os registros do dia (pagina automaticamente) ──
+// ── Busca registros no Supabase ───────────────────
 async function buscarTodosDia(dia) {
     const PAGE = 1000
     let todos = []
@@ -54,26 +81,57 @@ async function buscarTodosDia(dia) {
         if (data.length < PAGE) break
         from += PAGE
     }
-
     return todos
 }
 
-// ── Carregar dados ────────────────────────────────
+// ── Preencher Tabela de Dados abaixo do Gráfico ───
+function preencherTabelaImpressao(data) {
+    const corpoTabela = document.getElementById("corpoTabelaImpressao")
+    if (!corpoTabela) return
+
+    corpoTabela.innerHTML = "" // Limpa registros antigos
+
+    if (!data || data.length === 0) {
+        corpoTabela.innerHTML = `<tr><td colspan="2" class="text-center p-3 text-slate-400">Nenhum dado encontrado para este período.</td></tr>`
+        return
+    }
+
+    // Estruturação inteligente: se houver mais de 60 registros, amostra de 15 em 15 minutos para manter o relatório limpo
+    const intervaloAmostra = data.length > 60 ? Math.ceil(data.length / 48) : 1;
+
+    data.forEach((item, index) => {
+        if (index % intervaloAmostra !== 0 && index !== data.length - 1) return;
+
+        const dataObjeto = new Date(item.data.replace(" ", "T"))
+        const horarioFormatado = dataObjeto.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit"
+        })
+
+        const tr = document.createElement("tr")
+        tr.className = "border-b border-slate-100 hover:bg-slate-50"
+        tr.innerHTML = `
+            <td class="p-3 font-medium text-slate-700">${horarioFormatado}</td>
+            <td class="p-3 text-slate-900 font-semibold">${Number(item.valor).toFixed(2)} °C</td>
+        `
+        corpoTabela.appendChild(tr)
+    })
+}
+
+// ── Carregar dados e renderizar gráfico ───────────
 async function carregarDados() {
     const dia = getDia()
-
-    // Só bloqueia re-render pelo ultimoRegistro quando estiver no dia de hoje
     const ehHoje = dia === new Date().toLocaleDateString("en-CA", { timeZone: TIMEZONE })
 
-    // Título com a data exibida
     const [ano, mes, d] = dia.split("-")
-    document.getElementById("tituloHoje").textContent =
-        `Temperatura ${d}/${mes}/${ano}`
+    document.getElementById("tituloHoje").textContent = `Temperatura ${d}/${mes}/${ano}`
 
     const data = await buscarTodosDia(dia)
     if (!data || data.length === 0) return
 
-    // Cache só para o dia de hoje (evita re-renders desnecessários)
+    // Salva no cache global para o gerador de relatórios utilizar
+    cacheDadosImpressao = data
+
     if (ehHoje) {
         const ultimoAtual = data[data.length - 1].id
         if (ultimoRegistro === ultimoAtual) return
@@ -142,28 +200,72 @@ async function carregarDados() {
     })
 }
 
-// ── Flatpickr — filtro de dia ─────────────────────
+// ── Atribuição dos Event listeners dos botões ─────
+document.getElementById("menuBtn").addEventListener("click", abrirMenu)
+document.getElementById("overlay").addEventListener("click", fecharMenu)
+
+// Dispara a montagem dinâmica dos dados consolidados antes de abrir o print nativo
+document.getElementById("btnPrint").addEventListener("click", () => {
+    preencherTabelaImpressao(cacheDadosImpressao)
+    window.print()
+})
+
+// Navegação entre páginas
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        const page = btn.dataset.page
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.add('hidden')
+            p.classList.remove('active')
+        })
+        const alvo = document.getElementById(page)
+        alvo.classList.remove('hidden')
+        alvo.classList.add('active')
+        fecharMenu()
+    })
+})
+
+// Tema dark/light
+const html = document.documentElement
+const temaBtn = document.getElementById('temaBtn')
+const temaIcon = document.getElementById('temaIcon')
+const temaLabel = document.getElementById('temaLabel')
+
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    html.classList.add('dark')
+    temaIcon.textContent = '☀️'
+    temaLabel.textContent = 'Tema Claro'
+}
+
+temaBtn.addEventListener('click', () => {
+    const isDark = html.classList.toggle('dark')
+    temaIcon.textContent = isDark ? '☀️' : '🌙'
+    temaLabel.textContent = isDark ? 'Tema Claro' : 'Tema Escuro'
+    ultimoRegistro = null
+    carregarDados()
+})
+
+// ── Inicialização dos componentes Flatpickr ───────
 flatpickr("#filtroData", {
     locale: "pt",
     dateFormat: "d/m/Y",
-    maxDate: "today",          // não permite data futura
+    maxDate: "today",
     onChange(selectedDates) {
         if (!selectedDates.length) return
         const d = selectedDates[0]
-        // converte para "YYYY-MM-DD"
         dataSelecionada = d.toLocaleDateString("en-CA")
-        ultimoRegistro = null   // força re-render
+        ultimoRegistro = null
         carregarDados()
     }
 })
 
-// Flatpickr — comparativo (range)
 flatpickr("#intervalo", { mode: "range", locale: "pt", dateFormat: "d/m/Y" })
 
-// ── Init ──────────────────────────────────────────
+// ── Execução Inicial ──────────────────────────────
 iniciarRelogio()
 carregarDados()
-setInterval(carregarDados, 15000)   // só atualiza se for hoje
+setInterval(carregarDados, 15000)
 
-// ── Comparativo ───────────────────────────────────
 document.getElementById("btnComparar").onclick = carregarComparativo
