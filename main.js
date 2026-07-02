@@ -204,10 +204,27 @@ async function carregarDados() {
 document.getElementById("menuBtn").addEventListener("click", abrirMenu)
 document.getElementById("overlay").addEventListener("click", fecharMenu)
 
-// Dispara a montagem dinâmica dos dados consolidados antes de abrir o print nativo
+// Dispara a montagem dinâmica dos dados consolidados e define o nome do PDF antes de abrir o print nativo
 document.getElementById("btnPrint").addEventListener("click", () => {
+    // 1. Preenche a tabela com os dados do dia selecionado (pode ser hoje ou um dia anterior)
     preencherTabelaImpressao(cacheDadosImpressao)
+    
+    // 2. Descobre qual data está ativa para formatar o nome do arquivo
+    const diaAtivo = getDia() // Retorna no formato YYYY-MM-DD
+    const [ano, mes, dia] = diaAtivo.split("-")
+    const dataFormatada = `${dia}/${mes}/${ano}`
+    
+    // 3. Salva o título original do site para restaurar depois
+    const tituloOriginal = document.title
+    
+    // 4. Altera o título temporariamente (o navegador usa isso como nome padrão do PDF)
+    document.title = `Histórico Temperaturas - ${dataFormatada}`
+    
+    // 5. Abre a janela de impressão do sistema
     window.print()
+    
+    // 6. Restaura o título original na aba do navegador assim que a janela fecha
+    document.title = tituloOriginal
 })
 
 // Navegação entre páginas
