@@ -214,7 +214,7 @@ document.getElementById("btnPrint").addEventListener("click", () => {
     // 2. Injeta a data no título grande do topo da folha de impressão
     const tituloImpressaoA4 = document.getElementById("tituloImpressaoA4")
     if (tituloImpressaoA4) {
-        tituloImpressaoA4.textContent = `Histórico Temperaturas - ${dataFormatada}`
+        tituloImpressaoA4.textContent = `Gráfico variação de Temperaturas - ${dataFormatada}`
     }
 
     // 3. Altera temporariamente o título da aba do navegador para nomear o arquivo PDF
