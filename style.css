@@ -131,14 +131,14 @@ body {
     font-size: 13px !important;
 }
 
+
 /* ==========================================================================
    CONFIGURAÇÃO DA PÁGINA DE IMPRESSÃO (FOLHA A4 PORTRAIT/RETRATO)
    ========================================================================== */
 @media print {
     @page {
         size: A4 portrait;
-        /* Retrato para acomodar o gráfico e a tabela abaixo */
-        margin: 15mm;
+        margin: 20mm 15mm;
     }
 
     body {
@@ -148,23 +148,22 @@ body {
         padding: 0 !important;
     }
 
-    /* Ocultar elementos desnecessários */
-    #sidebar,
-    #menuBtn,
-    #overlay,
-    #filtroData,
-    .flex-wrap,
-    #btnComparar,
-    #intervalo {
+    /* Ocultar elementos desnecessários na impressão */
+    #sidebar, #menuBtn, #overlay, #filtroData, .flex-wrap, #btnComparar, #intervalo, h1#tituloHoje, p.text-sm {
         display: none !important;
     }
 
-    /* Manter os cards informativos de Máxima/Mínima visíveis e bem alinhados */
+    /* Exibir o título grande exclusivo do PDF */
+    #tituloImpressaoContainer {
+        display: block !important;
+    }
+
+    /* Manter os cards informativos de Máxima/Mínima (Rodapé/Informações) bem alinhados */
     .cards-container {
         display: grid !important;
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
         gap: 12px !important;
-        margin-bottom: 20px !important;
+        margin-top: 25px !important;
     }
 
     .info-card {
@@ -188,50 +187,22 @@ body {
         width: 100% !important;
     }
 
+    /* Garante que o gráfico ocupe um bom espaço na folha */
     .chart-print-container {
         width: 100% !important;
         border: none !important;
         padding: 0 !important;
         box-shadow: none !important;
         background: transparent !important;
-        page-break-inside: avoid;
-        /* Mantém o bloco do gráfico unido */
     }
 
     .canvas-wrapper {
         width: 100% !important;
-        height: 320px !important;
-        /* Altura controlada para caber dados abaixo */
+        height: 400px !important; /* Aumentado um pouco já que não tem mais a tabela */
     }
 
     canvas {
         width: 100% !important;
         height: 100% !important;
-    }
-
-    /* Ativar container da tabela apenas na impressão */
-    #tabelaImpressaoContainer {
-        display: block !important;
-    }
-
-    table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-    }
-
-    th,
-    td {
-        border: 1px solid #e2e8f0 !important;
-        padding: 6px 10px !important;
-        font-family: 'DM Mono', monospace !important;
-    }
-
-    th {
-        background-color: #f1f5f9 !important;
-        color: #000000 !important;
-    }
-
-    tr {
-        page-break-inside: avoid;
     }
 }

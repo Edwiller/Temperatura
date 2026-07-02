@@ -204,26 +204,27 @@ async function carregarDados() {
 document.getElementById("menuBtn").addEventListener("click", abrirMenu)
 document.getElementById("overlay").addEventListener("click", fecharMenu)
 
-// Dispara a montagem dinâmica dos dados consolidados e define o nome do PDF antes de abrir o print nativo
+// Dispara a configuração do título do documento e abre a tela de impressão
 document.getElementById("btnPrint").addEventListener("click", () => {
-    // 1. Preenche a tabela com os dados do dia selecionado (pode ser hoje ou um dia anterior)
-    preencherTabelaImpressao(cacheDadosImpressao)
-    
-    // 2. Descobre qual data está ativa para formatar o nome do arquivo
-    const diaAtivo = getDia() // Retorna no formato YYYY-MM-DD
+    // 1. Descobre qual data está ativa no sistema
+    const diaAtivo = getDia() // Retorna YYYY-MM-DD
     const [ano, mes, dia] = diaAtivo.split("-")
     const dataFormatada = `${dia}/${mes}/${ano}`
-    
-    // 3. Salva o título original do site para restaurar depois
+
+    // 2. Injeta a data no título grande do topo da folha de impressão
+    const tituloImpressaoA4 = document.getElementById("tituloImpressaoA4")
+    if (tituloImpressaoA4) {
+        tituloImpressaoA4.textContent = `Histórico Temperaturas - ${dataFormatada}`
+    }
+
+    // 3. Altera temporariamente o título da aba do navegador para nomear o arquivo PDF
     const tituloOriginal = document.title
-    
-    // 4. Altera o título temporariamente (o navegador usa isso como nome padrão do PDF)
     document.title = `Histórico Temperaturas - ${dataFormatada}`
-    
-    // 5. Abre a janela de impressão do sistema
+
+    // 4. Abre a janela de impressão
     window.print()
-    
-    // 6. Restaura o título original na aba do navegador assim que a janela fecha
+
+    // 5. Restaura o título padrão da aba
     document.title = tituloOriginal
 })
 
