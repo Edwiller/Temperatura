@@ -1,229 +1,579 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="light">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Temperatura</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <meta name="description" content="Sistema de cadastro e monitoramento térmico de caixas.">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <title>Cadastro de Caixa | Monitoramento Térmico</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:,">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js" defer></script>
-    <script type="module" src="main.js" defer></script>
+    <!-- CSS geral do sistema -->
+    <link rel="stylesheet" href="./assets/css/global.css">
+
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="./assets/css/cadastro.css">
+
+    <!-- JavaScript específico desta página -->
+    <script type="module" src="./assets/js/pages/cadastro.js" defer></script>
+
+    <script type="module" src="./assets/js/tests/indexSmokeTest.js" defer></script>
+
+    <script type="module" src="./assets/js/tests/sensorServiceTest.js" defer></script>
+
+    <script type="module" src="./assets/js/tests/sensorSelectTest.js" defer></script>
+
+    <script type="module" src="./assets/js/tests/validacoesTest.js" defer></script>
+
+    <script type="module" src="./assets/js/tests/caixaServiceTest.js" defer></script>
+
+    <script type="module" src="./assets/js/tests/sensorAssociacaoTest.js" defer></script>
+
+    <script type="module" src="./assets/js/tests/cadastroCompletoTest.js" defer></script>
+
+
 </head>
 
-<body
-    class="bg-slate-100 dark:bg-[#07111f] text-slate-800 dark:text-slate-100 min-h-screen flex transition-colors duration-300">
 
-    <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+<body>
 
-    <button id="menuBtn"
-        class="md:hidden fixed top-4 left-4 z-50 bg-accent text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-accent/30 transition hover:scale-105 active:scale-95"
-        aria-label="Abrir menu">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-    </button>
+    <!-- =====================================================
+         CABEÇALHO
+    ====================================================== -->
 
-    <aside id="sidebar"
-        class="fixed md:static top-0 left-0 h-full md:h-auto w-64 z-50 md:z-auto bg-[#0b1f3a] dark:bg-[#060f1e] text-white flex flex-col gap-3 p-5 shadow-2xl md:shadow-none -translate-x-full md:translate-x-0">
+    <header class="topo">
 
-        <div class="flex items-center gap-2 mb-2 pb-4 border-b border-white/10">
-            <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-sm">🌡</div>
-            <h2 class="text-lg font-bold tracking-tight">Dashboard</h2>
+        <div class="topo-conteudo">
+
+            <div class="marca">
+
+                <div class="marca-icone" aria-hidden="true">
+                    T
+                </div>
+
+                <div class="marca-texto">
+                    <strong>Monitoramento Térmico</strong>
+                    <span>Controle de caixas</span>
+                </div>
+
+            </div>
+
+            <div class="ambiente">
+                <span class="ambiente-indicador"></span>
+                Ambiente de desenvolvimento
+            </div>
+
         </div>
 
-        <nav class="flex flex-col gap-2">
-            <button
-                class="nav-btn active flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-accent/80 text-left"
-                data-page="tempo">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                </svg>
-                Tempo Real
-            </button>
-            <button
-                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-white/10 text-left"
-                data-page="comparativo">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="3" width="4" height="18" rx="1" />
-                    <rect x="10" y="8" width="4" height="13" rx="1" />
-                    <rect x="18" y="13" width="4" height="8" rx="1" />
-                </svg>
-                Comparativo
-            </button>
-        </nav>
+    </header>
 
-        <button id="btnPrint"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-blue-600/20 text-blue-400 hover:bg-blue-600/40 transition text-left w-full mt-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                <path d="M6 14h12v8H6z"></path>
-            </svg>
-            Imprimir Relatório
-        </button>
 
-        <div class="flex-1"></div>
+    <!-- =====================================================
+         CONTEÚDO PRINCIPAL
+    ====================================================== -->
 
-        <button id="temaBtn"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition hover:bg-white/10 text-left w-full">
-            <span id="temaIcon">🌙</span>
-            <span id="temaLabel">Tema Escuro</span>
-        </button>
+    <main class="pagina">
 
-        <div class="border-t border-white/10 pt-4 mt-1">
-            <div class="flex items-center gap-2 text-xs text-white/50 mb-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                </svg>
-                Horário — Acre (UTC-5)
-            </div>
-            <span id="relogioNTP" class="temp-value text-2xl font-medium tracking-widest text-white">--:--:--</span>
-            <div class="flex items-center gap-1.5 mt-1">
-                <span class="pulse w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
-                <span id="statusNTP" class="text-xs text-white/40">Sincronizando...</span>
-            </div>
-        </div>
-    </aside>
+        <!-- TÍTULO -->
 
-    <main class="flex-1 p-6 md:p-8 overflow-x-hidden">
+        <section class="pagina-cabecalho">
 
-        <section id="tempo" class="page active max-w-6xl mx-auto">
-            <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
-                <div>
-                    <h1 id="tituloHoje" class="text-2xl font-bold tracking-tight">Temperatura</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Monitoramento em tempo real</p>
-                </div>
-                <input type="text" id="filtroData"
-                    class="bg-white dark:bg-[#0f1f35] border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent/40 cursor-pointer min-w-44"
-                    placeholder="📅 Filtrar por data" readonly>
-            </div>
+            <div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 cards-container">
-                <div
-                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span
-                            class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-sm">🌡</span>
-                        <span
-                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Atual</span>
-                    </div>
-                    <p id="tempAtual" class="temp-value text-3xl font-medium text-slate-800 dark:text-white">--°C</p>
-                </div>
+                <span class="etiqueta">
+                    Nova caixa
+                </span>
 
-                <div
-                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span
-                            class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-sm">🔥</span>
-                        <span
-                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Máxima</span>
-                    </div>
-                    <p id="tempMax" class="temp-value text-3xl font-medium text-red-500">--°C</p>
-                </div>
-
-                <div
-                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span
-                            class="w-7 h-7 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center text-sm">❄</span>
-                        <span
-                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mínima</span>
-                    </div>
-                    <p id="tempMin" class="temp-value text-3xl font-medium text-cyan-500">--°C</p>
-                </div>
-            </div>
-
-            <div
-                class="bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm chart-print-container">
-                <div class="relative h-72 md:h-96 w-full canvas-wrapper">
-                    <canvas id="graficoTemperatura"></canvas>
-                </div>
-            </div>
-
-            <div id="tituloImpressaoContainer" class="hidden text-center mb-6">
-                <h1 id="tituloImpressaoA4" class="text-3xl font-bold tracking-tight text-slate-900">
-                    Histórico Temperaturas - --/--/----
+                <h1>
+                    Cadastrar caixa
                 </h1>
+
+                <p>
+                    Informe os dados da caixa e selecione
+                    o sensor responsável pelo monitoramento
+                    da temperatura.
+                </p>
+
             </div>
+
         </section>
 
-        <section id="comparativo" class="page hidden max-w-6xl mx-auto">
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold tracking-tight">Comparativo</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Compare um intervalo de datas</p>
+
+        <!-- =================================================
+             FORMULÁRIO
+        ================================================== -->
+
+        <form id="formCaixa" class="formulario">
+
+            <!-- =============================================
+                 01 - IDENTIFICAÇÃO
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        01
+                    </span>
+
+                    <div>
+                        <h2>Identificação</h2>
+
+                        <p>
+                            Dados utilizados para identificar
+                            esta caixa no sistema.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid">
+
+                    <div class="campo">
+
+                        <label for="codigo">
+                            Código da caixa
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <input type="text" id="codigo" name="codigo" placeholder="Ex.: CX-001" maxlength="50"
+                            autocomplete="off" required>
+
+                        <small>
+                            Utilize um código único para cada caixa.
+                        </small>
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="nome">
+                            Nome / identificação
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <input type="text" id="nome" name="nome" placeholder="Ex.: Caixa transporte 01" maxlength="100"
+                            autocomplete="off" required>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 02 - DIMENSÕES
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        02
+                    </span>
+
+                    <div>
+                        <h2>Dimensões da caixa</h2>
+
+                        <p>
+                            Informe o volume e as dimensões
+                            físicas da caixa.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid campos-grid-4">
+
+                    <!-- VOLUME -->
+
+                    <div class="campo">
+
+                        <label for="volume">
+                            Volume
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="volume" name="volume" placeholder="0" min="0.01" step="0.01"
+                                required>
+
+                            <span>L</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COMPRIMENTO -->
+
+                    <div class="campo">
+
+                        <label for="comprimento">
+                            Comprimento
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="comprimento" name="comprimento" placeholder="0" min="0"
+                                step="0.01">
+
+                            <span>cm</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LARGURA -->
+
+                    <div class="campo">
+
+                        <label for="largura">
+                            Largura
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="largura" name="largura" placeholder="0" min="0" step="0.01">
+
+                            <span>cm</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ALTURA -->
+
+                    <div class="campo">
+
+                        <label for="altura">
+                            Altura
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="altura" name="altura" placeholder="0" min="0" step="0.01">
+
+                            <span>cm</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 03 - CONTEÚDO
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        03
+                    </span>
+
+                    <div>
+                        <h2>Conteúdo da caixa</h2>
+
+                        <p>
+                            Informe a quantidade transportada
+                            e o peso de gelo utilizado.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid">
+
+                    <!-- HEMOCOMPONENTES -->
+
+                    <div class="campo">
+
+                        <label for="hemocomponentes">
+                            Quantidade de hemocomponentes
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <input type="number" id="hemocomponentes" name="hemocomponentes" value="0" min="0" step="1"
+                            required>
+
+                    </div>
+
+
+                    <!-- GELO -->
+
+                    <div class="campo">
+
+                        <label for="gelo">
+                            Peso do gelo
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="gelo" name="gelo" value="0" min="0" step="0.01" required>
+
+                            <span>kg</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 04 - TEMPERATURA
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        04
+                    </span>
+
+                    <div>
+                        <h2>Faixa de temperatura</h2>
+
+                        <p>
+                            Defina os limites que serão usados
+                            posteriormente na análise dos dados.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid">
+
+                    <!-- MÍNIMA -->
+
+                    <div class="campo">
+
+                        <label for="temperaturaMin">
+                            Temperatura mínima
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="temperaturaMin" name="temperaturaMin" placeholder="Ex.: 2"
+                                step="0.01" required>
+
+                            <span>°C</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MÁXIMA -->
+
+                    <div class="campo">
+
+                        <label for="temperaturaMax">
+                            Temperatura máxima
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="temperaturaMax" name="temperaturaMax" placeholder="Ex.: 8"
+                                step="0.01" required>
+
+                            <span>°C</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="aviso">
+
+                    <span class="aviso-icone">
+                        i
+                    </span>
+
+                    <p>
+                        As temperaturas registradas serão
+                        comparadas com essa faixa para identificar
+                        leituras normais e fora do limite.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 05 - SENSOR
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        05
+                    </span>
+
+                    <div>
+
+                        <h2>
+                            Sensor de temperatura
+                        </h2>
+
+                        <p>
+                            Selecione qual dispositivo ficará
+                            associado a esta caixa.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ESTADO DE CARREGAMENTO -->
+
+                <div id="sensorCarregando" class="sensor-carregando">
+
+                    <span class="carregando-spinner"></span>
+
+                    Carregando sensores disponíveis...
+
+                </div>
+
+
+                <!-- SELECT DO SENSOR -->
+
+                <div id="sensorContainer" class="campo sensor-container oculto">
+
+                    <label for="sensor">
+                        Sensor disponível
+                        <span class="obrigatorio">*</span>
+                    </label>
+
+                    <select id="sensor" name="sensor" required>
+
+                        <option value="">
+                            Selecione um sensor
+                        </option>
+
+                    </select>
+
+
+                    <small>
+                        Somente sensores ativos e não associados
+                        a outra caixa serão exibidos.
+                    </small>
+
+                </div>
+
+
+                <!-- NENHUM SENSOR -->
+
+                <div id="semSensores" class="estado-vazio oculto">
+
+                    <div class="estado-vazio-icone">
+                        !
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Nenhum sensor disponível
+                        </strong>
+
+                        <p>
+                            Todos os sensores ativos já estão
+                            associados a outras caixas ou ainda
+                            não existem sensores cadastrados.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 MENSAGENS
+            ============================================== -->
+
+            <div id="mensagem" class="mensagem oculto" role="alert" aria-live="polite">
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 mb-6">
-                <input type="text" id="intervalo"
-                    class="bg-white dark:bg-[#0f1f35] border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium min-w-64 focus:outline-none focus:ring-2 focus:ring-accent/40"
-                    placeholder="Selecione o período">
-                <button id="btnComparar"
-                    class="bg-accent hover:bg-accent-dark text-white px-5 py-3 rounded-xl text-sm font-semibold transition shadow-md shadow-accent/20 active:scale-95">
-                    Comparar
+
+            <!-- =============================================
+                 BOTÕES
+            ============================================== -->
+
+            <div class="formulario-acoes">
+
+                <button type="reset" id="btnLimpar" class="botao botao-secundario">
+                    Limpar formulário
                 </button>
+
+
+                <button type="submit" id="btnSalvar" class="botao botao-principal">
+
+                    <span id="btnSalvarTexto">
+                        Cadastrar caixa
+                    </span>
+
+                    <span id="btnSalvarSpinner" class="botao-spinner oculto">
+                    </span>
+
+                </button>
+
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div
-                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span
-                            class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-sm">🔥</span>
-                        <span
-                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mais
-                            alta</span>
-                    </div>
-                    <p id="maiorTemp" class="temp-value text-3xl font-medium text-red-500">--°C</p>
-                </div>
-                <div
-                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span
-                            class="w-7 h-7 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center text-sm">❄</span>
-                        <span
-                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mais
-                            baixa</span>
-                    </div>
-                    <p id="menorTemp" class="temp-value text-3xl font-medium text-cyan-500">--°C</p>
-                </div>
-                <div
-                    class="info-card bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span
-                            class="w-7 h-7 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center text-sm">📊</span>
-                        <span
-                            class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Média</span>
-                    </div>
-                    <p id="mediaTemp" class="temp-value text-3xl font-medium text-violet-500">--°C</p>
-                </div>
-            </div>
+        </form>
 
-            <div
-                class="bg-white dark:bg-[#0f1f35] rounded-2xl p-5 border border-slate-200 dark:border-slate-700/50 shadow-sm chart-print-container">
-                <div class="relative h-72 md:h-96 w-full canvas-wrapper">
-                    <canvas id="graficoComparativo"></canvas>
-                </div>
-            </div>
-        </section>
     </main>
+
+
+    <!-- =====================================================
+         RODAPÉ
+    ====================================================== -->
+
+    <footer class="rodape">
+
+        <p>
+            Sistema de Monitoramento Térmico
+        </p>
+
+        <span>
+            Ambiente DEV
+        </span>
+
+    </footer>
 
 </body>
 

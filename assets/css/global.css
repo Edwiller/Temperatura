@@ -1,0 +1,103 @@
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================================================
+   VARIÁVEIS
+========================================================= */
+
+:root {
+
+    --cor-primaria: #2563eb;
+    --cor-primaria-hover: #1d4ed8;
+    --cor-primaria-clara: #eff6ff;
+
+    --cor-texto: #172033;
+    --cor-texto-secundario: #64748b;
+
+    --cor-fundo: #f5f7fb;
+    --cor-card: #ffffff;
+
+    --cor-borda: #e2e8f0;
+
+    --cor-sucesso: #15803d;
+    --cor-sucesso-fundo: #dcfce7;
+
+    --cor-erro: #b91c1c;
+    --cor-erro-fundo: #fee2e2;
+
+    --cor-aviso: #a16207;
+    --cor-aviso-fundo: #fef9c3;
+
+    --sombra-card:
+        0 10px 35px rgba(15, 23, 42, 0.06);
+
+    --raio-pequeno: 8px;
+    --raio-medio: 12px;
+    --raio-grande: 18px;
+}
+
+
+/* =========================================================
+   DOCUMENTO
+========================================================= */
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+
+    min-height: 100vh;
+
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: var(--cor-fundo);
+
+    color: var(--cor-texto);
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+
+button {
+    cursor: pointer;
+}
+
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   UTILITÁRIOS
+========================================================= */
+
+.oculto {
+    display: none !important;
+}

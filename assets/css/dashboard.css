@@ -1,0 +1,630 @@
+/* =========================================================
+   TOPO
+========================================================= */
+
+.topo {
+
+    background: white;
+
+    border-bottom:
+        1px solid var(--cor-borda);
+}
+
+
+.topo-conteudo {
+
+    width:
+        min(
+            calc(100% - 40px),
+            1200px
+        );
+
+    min-height: 72px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.marca {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.marca-icone {
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background:
+        var(--cor-primaria);
+
+    color: white;
+
+    font-weight: 700;
+}
+
+
+.marca-texto {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.marca-texto strong {
+
+    font-size: 14px;
+}
+
+
+.marca-texto span {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 12px;
+}
+
+
+.botao-voltar {
+
+    padding: 9px 14px;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background: #f1f5f9;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard {
+
+    width:
+        min(
+            calc(100% - 40px),
+            1200px
+        );
+
+    margin: auto;
+
+    padding:
+        45px 0 70px;
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.dashboard-estado {
+
+    min-height: 300px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    text-align: center;
+
+    color:
+        var(--cor-texto-secundario);
+}
+
+
+.dashboard-erro strong {
+
+    color:
+        var(--cor-erro);
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   CABEÇALHO
+========================================================= */
+
+.dashboard-cabecalho {
+
+    margin-bottom: 30px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+}
+
+
+.dashboard-cabecalho h1 {
+
+    margin:
+        8px 0 10px;
+
+    font-size:
+        clamp(
+            28px,
+            4vw,
+            38px
+        );
+}
+
+
+.etiqueta {
+
+    display: inline-block;
+
+    padding:
+        5px 10px;
+
+    border-radius: 999px;
+
+    background:
+        var(--cor-primaria-clara);
+
+    color:
+        var(--cor-primaria);
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+.caixa-identificacao {
+
+    display: flex;
+
+    gap: 18px;
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   SENSOR
+========================================================= */
+
+.sensor-status {
+
+    min-width: 220px;
+
+    padding: 14px 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    border:
+        1px solid #bbf7d0;
+
+    border-radius:
+        var(--raio-medio);
+
+    background: #f0fdf4;
+}
+
+
+.sensor-status-ponto {
+
+    width: 10px;
+    height: 10px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+}
+
+
+.sensor-status div {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.sensor-status small {
+
+    color: #15803d;
+
+    font-size: 10px;
+}
+
+
+.sensor-status strong {
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SEÇÕES
+========================================================= */
+
+.dashboard-secao {
+
+    margin-bottom: 24px;
+
+    padding: 28px;
+
+    border:
+        1px solid var(--cor-borda);
+
+    border-radius:
+        var(--raio-grande);
+
+    background:
+        var(--cor-card);
+
+    box-shadow:
+        var(--sombra-card);
+}
+
+
+.secao-titulo {
+
+    margin-bottom: 22px;
+}
+
+
+.secao-titulo h2 {
+
+    margin-bottom: 4px;
+
+    font-size: 17px;
+}
+
+
+.secao-titulo p {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.info-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 15px;
+}
+
+
+.info-card {
+
+    padding: 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    border:
+        1px solid var(--cor-borda);
+
+    border-radius:
+        var(--raio-medio);
+
+    background: #f8fafc;
+}
+
+
+.info-label {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 11px;
+}
+
+
+.info-valor {
+
+    margin-top: 6px;
+
+    font-size: 24px;
+}
+
+
+.info-valor-texto {
+
+    font-size: 17px;
+}
+
+
+.info-unidade {
+
+    margin-top: 2px;
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   DIMENSÕES
+========================================================= */
+
+.dados-linha {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 15px;
+}
+
+
+.dados-linha div {
+
+    padding: 16px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background: #f8fafc;
+}
+
+
+.dados-linha span {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 11px;
+}
+
+
+.dados-linha strong {
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   FAIXA
+========================================================= */
+
+.faixa-temperatura {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+}
+
+
+.faixa-card {
+
+    flex: 1;
+
+    padding: 20px;
+
+    border-radius:
+        var(--raio-medio);
+
+    background:
+        var(--cor-primaria-clara);
+}
+
+
+.faixa-card span {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 11px;
+}
+
+
+.faixa-card strong {
+
+    display: block;
+
+    margin-top: 6px;
+
+    color:
+        var(--cor-primaria);
+
+    font-size: 26px;
+}
+
+
+.faixa-separador {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+========================================================= */
+
+.monitoramento-placeholder {
+
+    padding: 35px;
+
+    text-align: center;
+
+    border:
+        1px dashed #cbd5e1;
+
+    border-radius:
+        var(--raio-medio);
+
+    background: #f8fafc;
+}
+
+
+.monitoramento-placeholder strong {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+}
+
+
+.monitoramento-placeholder p {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+    max-width: 850px
+) {
+
+    .info-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (
+    max-width: 600px
+) {
+
+    .dashboard {
+
+        width:
+            calc(100% - 28px);
+
+        padding-top: 30px;
+    }
+
+
+    .dashboard-cabecalho {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .sensor-status {
+
+        width: 100%;
+    }
+
+
+    .info-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .dados-linha {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .faixa-temperatura {
+
+        flex-direction: column;
+    }
+
+
+    .faixa-card {
+
+        width: 100%;
+    }
+
+
+    .faixa-separador {
+
+        align-self: center;
+    }
+
+
+    .dashboard-secao {
+
+        padding: 20px;
+    }
+
+}

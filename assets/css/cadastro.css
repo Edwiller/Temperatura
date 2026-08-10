@@ -1,0 +1,906 @@
+/* =========================================================
+   TOPO
+========================================================= */
+
+.topo {
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid var(--cor-borda);
+}
+
+
+.topo-conteudo {
+
+    width: min(
+        calc(100% - 40px),
+        1100px
+    );
+
+    min-height: 72px;
+
+    margin: 0 auto;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   MARCA
+========================================================= */
+
+.marca {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.marca-icone {
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: var(--cor-primaria);
+
+    color: white;
+
+    font-weight: 700;
+
+    font-size: 18px;
+}
+
+
+.marca-texto {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.marca-texto strong {
+
+    font-size: 14px;
+}
+
+
+.marca-texto span {
+
+    font-size: 12px;
+
+    color:
+        var(--cor-texto-secundario);
+}
+
+
+/* =========================================================
+   AMBIENTE
+========================================================= */
+
+.ambiente {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    background: #f1f5f9;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.ambiente-indicador {
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+}
+
+
+/* =========================================================
+   PÁGINA
+========================================================= */
+
+.pagina {
+
+    width: min(
+        calc(100% - 40px),
+        1000px
+    );
+
+    margin: 0 auto;
+
+    padding:
+        55px 0 70px;
+}
+
+
+/* =========================================================
+   CABEÇALHO DA PÁGINA
+========================================================= */
+
+.pagina-cabecalho {
+
+    margin-bottom: 28px;
+}
+
+
+.etiqueta {
+
+    display: inline-block;
+
+    padding: 6px 11px;
+
+    margin-bottom: 12px;
+
+    border-radius: 999px;
+
+    background:
+        var(--cor-primaria-clara);
+
+    color:
+        var(--cor-primaria);
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.pagina-cabecalho h1 {
+
+    margin-bottom: 8px;
+
+    font-size: clamp(
+        28px,
+        4vw,
+        38px
+    );
+
+    line-height: 1.2;
+}
+
+
+.pagina-cabecalho p {
+
+    max-width: 680px;
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   FORMULÁRIO
+========================================================= */
+
+.formulario {
+
+    overflow: hidden;
+
+    background:
+        var(--cor-card);
+
+    border:
+        1px solid var(--cor-borda);
+
+    border-radius:
+        var(--raio-grande);
+
+    box-shadow:
+        var(--sombra-card);
+}
+
+
+/* =========================================================
+   SEÇÕES
+========================================================= */
+
+.formulario-secao {
+
+    padding: 30px;
+
+    border-bottom:
+        1px solid var(--cor-borda);
+}
+
+
+.secao-cabecalho {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    margin-bottom: 24px;
+}
+
+
+.secao-numero {
+
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+        var(--cor-primaria-clara);
+
+    color:
+        var(--cor-primaria);
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.secao-cabecalho h2 {
+
+    margin-bottom: 4px;
+
+    font-size: 17px;
+}
+
+
+.secao-cabecalho p {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.campos-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 20px;
+}
+
+
+.campos-grid-4 {
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+}
+
+
+/* =========================================================
+   CAMPOS
+========================================================= */
+
+.campo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.campo label {
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.obrigatorio {
+
+    color: #dc2626;
+}
+
+
+.campo input,
+.campo select {
+
+    width: 100%;
+
+    min-height: 44px;
+
+    padding:
+        10px 12px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background: white;
+
+    color:
+        var(--cor-texto);
+
+    outline: none;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.campo input:focus,
+.campo select:focus {
+
+    border-color:
+        var(--cor-primaria);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+}
+
+
+.campo input::placeholder {
+
+    color: #94a3b8;
+}
+
+
+.campo small {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   INPUT COM UNIDADE
+========================================================= */
+
+.campo-unidade {
+
+    position: relative;
+}
+
+
+.campo-unidade input {
+
+    padding-right: 55px;
+}
+
+
+.campo-unidade > span {
+
+    position: absolute;
+
+    right: 12px;
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 12px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   AVISO
+========================================================= */
+
+.aviso {
+
+    margin-top: 20px;
+
+    padding: 14px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid var(--cor-borda);
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 12px;
+}
+
+
+.aviso-icone {
+
+    width: 22px;
+    height: 22px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        var(--cor-primaria);
+
+    color: white;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SENSOR
+========================================================= */
+
+.sensor-carregando {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 13px;
+}
+
+
+.carregando-spinner {
+
+    width: 18px;
+    height: 18px;
+
+    border:
+        2px solid #dbeafe;
+
+    border-top-color:
+        var(--cor-primaria);
+
+    border-radius: 50%;
+
+    animation:
+        girar 0.8s linear infinite;
+}
+
+
+@keyframes girar {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+
+}
+
+
+.sensor-container {
+
+    max-width: 550px;
+}
+
+
+/* =========================================================
+   ESTADO VAZIO
+========================================================= */
+
+.estado-vazio {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    padding: 18px;
+
+    border-radius:
+        var(--raio-medio);
+
+    background:
+        var(--cor-aviso-fundo);
+
+    color:
+        var(--cor-aviso);
+}
+
+
+.estado-vazio-icone {
+
+    width: 30px;
+    height: 30px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eab308;
+
+    color: white;
+
+    font-weight: 700;
+}
+
+
+.estado-vazio strong {
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    font-size: 13px;
+}
+
+
+.estado-vazio p {
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MENSAGENS
+========================================================= */
+
+.mensagem {
+
+    margin:
+        25px 30px 0;
+
+    padding: 14px 16px;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    font-size: 13px;
+}
+
+
+.mensagem.sucesso {
+
+    background:
+        var(--cor-sucesso-fundo);
+
+    color:
+        var(--cor-sucesso);
+}
+
+
+.mensagem.erro {
+
+    background:
+        var(--cor-erro-fundo);
+
+    color:
+        var(--cor-erro);
+}
+
+
+/* =========================================================
+   AÇÕES
+========================================================= */
+
+.formulario-acoes {
+
+    padding: 25px 30px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    background: #fafafa;
+}
+
+
+.botao {
+
+    min-height: 42px;
+
+    padding:
+        10px 18px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    border: 0;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    transition:
+        background 0.2s,
+        transform 0.1s,
+        opacity 0.2s;
+}
+
+
+.botao:active {
+
+    transform:
+        scale(0.98);
+}
+
+
+.botao-principal {
+
+    background:
+        var(--cor-primaria);
+
+    color: white;
+}
+
+
+.botao-principal:hover {
+
+    background:
+        var(--cor-primaria-hover);
+}
+
+
+.botao-secundario {
+
+    background: #e2e8f0;
+
+    color: #475569;
+}
+
+
+.botao-secundario:hover {
+
+    background: #cbd5e1;
+}
+
+
+.botao:disabled {
+
+    opacity: 0.6;
+
+    cursor:
+        not-allowed;
+}
+
+
+/* =========================================================
+   SPINNER DO BOTÃO
+========================================================= */
+
+.botao-spinner {
+
+    width: 16px;
+    height: 16px;
+
+    border:
+        2px solid rgba(
+            255,
+            255,
+            255,
+            0.4
+        );
+
+    border-top-color: white;
+
+    border-radius: 50%;
+
+    animation:
+        girar 0.8s linear infinite;
+}
+
+
+/* =========================================================
+   RODAPÉ
+========================================================= */
+
+.rodape {
+
+    min-height: 60px;
+
+    padding:
+        15px 20px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 11px;
+}
+
+
+.rodape span {
+
+    padding:
+        3px 7px;
+
+    border-radius: 999px;
+
+    background:
+        #dcfce7;
+
+    color:
+        #15803d;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (
+    max-width: 850px
+) {
+
+    .campos-grid-4 {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+    max-width: 600px
+) {
+
+    .topo-conteudo {
+
+        width:
+            min(
+                calc(100% - 28px),
+                1100px
+            );
+    }
+
+
+    .ambiente {
+
+        display: none;
+    }
+
+
+    .pagina {
+
+        width:
+            min(
+                calc(100% - 28px),
+                1000px
+            );
+
+        padding:
+            35px 0 50px;
+    }
+
+
+    .formulario-secao {
+
+        padding: 22px;
+    }
+
+
+    .campos-grid,
+    .campos-grid-4 {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .formulario-acoes {
+
+        padding: 20px 22px;
+
+        flex-direction:
+            column-reverse;
+    }
+
+
+    .botao {
+
+        width: 100%;
+    }
+
+
+    .mensagem {
+
+        margin:
+            20px 22px 0;
+    }
+
+}
