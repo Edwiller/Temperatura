@@ -14,10 +14,8 @@
 .topo-conteudo {
 
     width:
-        min(
-            calc(100% - 40px),
-            1200px
-        );
+        min(calc(100% - 40px),
+            1200px);
 
     min-height: 72px;
 
@@ -110,10 +108,8 @@
 .dashboard {
 
     width:
-        min(
-            calc(100% - 40px),
-            1200px
-        );
+        min(calc(100% - 40px),
+            1200px);
 
     margin: auto;
 
@@ -178,11 +174,9 @@
         8px 0 10px;
 
     font-size:
-        clamp(
-            28px,
+        clamp(28px,
             4vw,
-            38px
-        );
+            38px);
 }
 
 
@@ -337,10 +331,8 @@
     display: grid;
 
     grid-template-columns:
-        repeat(
-            4,
-            minmax(0, 1fr)
-        );
+        repeat(4,
+            minmax(0, 1fr));
 
     gap: 15px;
 }
@@ -407,10 +399,8 @@
     display: grid;
 
     grid-template-columns:
-        repeat(
-            3,
-            minmax(0, 1fr)
-        );
+        repeat(3,
+            minmax(0, 1fr));
 
     gap: 15px;
 }
@@ -550,9 +540,7 @@
    MOBILE
 ========================================================= */
 
-@media (
-    max-width: 850px
-) {
+@media (max-width: 850px) {
 
     .info-grid {
 
@@ -563,9 +551,7 @@
 }
 
 
-@media (
-    max-width: 600px
-) {
+@media (max-width: 600px) {
 
     .dashboard {
 
@@ -625,6 +611,306 @@
     .dashboard-secao {
 
         padding: 20px;
+    }
+
+
+}
+
+/* =========================================================
+   MÉTRICAS
+========================================================= */
+
+.secao-titulo-status {
+
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.metricas-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4,
+            minmax(0, 1fr));
+
+    gap: 15px;
+}
+
+
+.metrica-card {
+
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    border:
+        1px solid var(--cor-borda);
+
+    border-radius:
+        var(--raio-medio);
+
+    background: #f8fafc;
+}
+
+
+.metrica-destaque {
+
+    background:
+        var(--cor-primaria-clara);
+
+    border-color:
+        var(--cor-primaria);
+}
+
+
+.metrica-label {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.metrica-valor {
+
+    margin-top: 5px;
+
+    font-size: 27px;
+}
+
+
+.metrica-descricao {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 10px;
+}
+
+
+.metricas-secundarias {
+
+    margin-top: 18px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4,
+            minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+
+.metricas-secundarias div {
+
+    padding: 14px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background: #f8fafc;
+}
+
+
+.metricas-secundarias span {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 10px;
+}
+
+
+.metricas-secundarias strong {
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-temperatura {
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.status-seguro {
+
+    background: #dcfce7;
+
+    color: #15803d;
+}
+
+
+.status-alerta {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+}
+
+
+.status-sem-dados {
+
+    background: #f1f5f9;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE DAS MÉTRICAS
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .metricas-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .metricas-secundarias {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .secao-titulo-status {
+
+        flex-direction: column;
+    }
+
+
+    .metricas-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .metricas-secundarias {
+
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+/* =========================================================
+   GRÁFICO DE TEMPERATURA
+========================================================= */
+
+.grafico-temperatura {
+
+    width: 100%;
+
+    height: 420px;
+
+    min-height: 420px;
+}
+
+
+.grafico-legenda-info {
+
+    margin-bottom: 15px;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 16px;
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   ESTADO SEM DADOS
+========================================================= */
+
+.grafico-sem-dados {
+
+    height: 250px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color:
+        var(--cor-texto-secundario);
+
+    background: #f8fafc;
+
+    border:
+        1px dashed var(--cor-borda);
+
+    border-radius:
+        var(--raio-medio);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .grafico-temperatura {
+
+        height: 320px;
+
+        min-height: 320px;
+    }
+
+
+    .grafico-legenda-info {
+
+        flex-direction: column;
+
+        gap: 5px;
     }
 
 }

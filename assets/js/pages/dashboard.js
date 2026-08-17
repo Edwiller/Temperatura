@@ -8,6 +8,24 @@ import {
 } from "../services/sensorService.js";
 
 
+import {
+    buscarTemperaturasDaCaixa
+} from "../services/temperaturaService.js";
+
+
+import {
+    calcularMetricasTemperatura
+} from "../utils/metricas.js";
+
+
+import {
+    mostrarCards
+} from "../components/cards.js";
+
+import {
+    mostrarGraficoTemperatura
+} from "../components/graficoTemperatura.js";
+
 /* =========================================================
    ELEMENTOS
 ========================================================= */
@@ -366,6 +384,10 @@ async function iniciarDashboard() {
 
     try {
 
+        /* =====================================================
+           1. BUSCAR CAIXA
+        ===================================================== */
+
         const caixa =
             await buscarCaixaPorId(
                 caixaId
@@ -377,6 +399,10 @@ async function iniciarDashboard() {
             caixa
         );
 
+
+        /* =====================================================
+           2. BUSCAR SENSOR
+        ===================================================== */
 
         const sensor =
             await buscarSensorPorCaixa(
@@ -390,20 +416,85 @@ async function iniciarDashboard() {
         );
 
 
+        /* =====================================================
+           3. BUSCAR TEMPERATURAS
+        ===================================================== */
+
+        const temperaturas =
+            await buscarTemperaturasDaCaixa(
+                caixaId
+            );
+
+
+        console.log(
+            `🌡️ ${temperaturas.length} temperaturas carregadas.`
+        );
+
+
+        console.log(
+            "🌡️ Temperaturas:",
+            temperaturas
+        );
+
+
+        /* =====================================================
+           4. CALCULAR MÉTRICAS
+        ===================================================== */
+
+        const metricas =
+            calcularMetricasTemperatura(
+                temperaturas,
+                Number(
+                    caixa.temperatura_min
+                ),
+                Number(
+                    caixa.temperatura_max
+                )
+            );
+
+
+        console.log(
+            "📊 Métricas:",
+            metricas
+        );
+
+
+        /* =====================================================
+           5. MOSTRAR DADOS DA CAIXA
+        ===================================================== */
+
         mostrarDadosCaixa(
             caixa
         );
 
+
+        /* =====================================================
+           6. MOSTRAR SENSOR
+        ===================================================== */
 
         mostrarDadosSensor(
             sensor
         );
 
 
-        /*
-         * Guardamos os IDs para os testes
-         * e para módulos futuros.
-         */
+        /* =====================================================
+           7. MOSTRAR CARDS DE TEMPERATURA
+        ===================================================== */
+
+        mostrarCards(
+            metricas
+        );
+
+
+        mostrarGraficoTemperatura(
+            temperaturas,
+            caixa.temperatura_min,
+            caixa.temperatura_max
+        );
+
+        /* =====================================================
+           8. GUARDAR IDs PARA TESTES E MÓDULOS FUTUROS
+        ===================================================== */
 
         dashboardConteudo.dataset.caixaId =
             caixa.id;
@@ -416,6 +507,10 @@ async function iniciarDashboard() {
 
         }
 
+
+        /* =====================================================
+           9. MOSTRAR DASHBOARD
+        ===================================================== */
 
         mostrarConteudo();
 
