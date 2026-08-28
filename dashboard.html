@@ -31,7 +31,10 @@
 
     <script type="module" src="./assets/js/tests/graficoTemperaturaTest.js" defer></script>
 
-    
+    <script type="module" src="./assets/js/tests/comparativoTest.js" defer></script>
+
+
+
 
 
 </head>
@@ -39,44 +42,56 @@
 
 <body>
 
+
+
     <!-- =====================================================
          TOPO
     ====================================================== -->
 
     <header class="topo">
 
+
         <div class="topo-conteudo">
+
 
             <div class="marca">
 
+
                 <div class="marca-icone">
+
                     T
+
                 </div>
 
 
                 <div class="marca-texto">
 
+
                     <strong>
                         Monitoramento Térmico
                     </strong>
+
 
                     <span>
                         Dashboard da caixa
                     </span>
 
+
                 </div>
+
 
             </div>
 
 
-            <a
-                href="./index.html"
-                class="botao-voltar"
-            >
+            <a href="./index.html" class="botao-voltar">
+
                 Nova caixa
+
             </a>
 
+
         </div>
+
 
     </header>
 
@@ -92,16 +107,16 @@
              CARREGANDO
         ================================================== -->
 
-        <section
-            id="dashboardCarregando"
-            class="dashboard-estado"
-        >
+        <section id="dashboardCarregando" class="dashboard-estado">
+
 
             <span class="carregando-spinner"></span>
+
 
             <p>
                 Carregando dados da caixa...
             </p>
+
 
         </section>
 
@@ -110,25 +125,24 @@
              ERRO
         ================================================== -->
 
-        <section
-            id="dashboardErro"
-            class="dashboard-estado dashboard-erro oculto"
-        >
+        <section id="dashboardErro" class="dashboard-estado dashboard-erro oculto">
+
 
             <strong>
                 Não foi possível carregar a caixa.
             </strong>
 
+
             <p id="dashboardErroMensagem">
             </p>
 
 
-            <a
-                href="./index.html"
-                class="botao botao-secundario"
-            >
+            <a href="./index.html" class="botao botao-secundario">
+
                 Voltar ao cadastro
+
             </a>
+
 
         </section>
 
@@ -137,22 +151,23 @@
              CONTEÚDO
         ================================================== -->
 
-        <div
-            id="dashboardConteudo"
-            class="oculto"
-        >
+        <div id="dashboardConteudo" class="oculto">
 
 
             <!-- =================================================
-                 CABEÇALHO DA CAIXA
+                 CABEÇALHO
             ================================================== -->
 
             <section class="dashboard-cabecalho">
 
+
                 <div>
 
+
                     <span class="etiqueta">
+
                         Caixa monitorada
+
                     </span>
 
 
@@ -162,6 +177,7 @@
 
 
                     <div class="caixa-identificacao">
+
 
                         <span>
 
@@ -184,36 +200,39 @@
 
                         </span>
 
+
                     </div>
+
 
                 </div>
 
 
                 <!-- SENSOR -->
 
-                <div
-                    id="sensorStatus"
-                    class="sensor-status"
-                >
+                <div id="sensorStatus" class="sensor-status">
 
-                    <span
-                        class="sensor-status-ponto"
-                    ></span>
+
+                    <span class="sensor-status-ponto"></span>
 
 
                     <div>
+
 
                         <small>
                             Sensor associado
                         </small>
 
+
                         <strong id="sensorNome">
                             -
                         </strong>
 
+
                     </div>
 
+
                 </div>
+
 
             </section>
 
@@ -224,20 +243,25 @@
 
             <section class="dashboard-secao">
 
+
                 <div class="secao-titulo">
 
+
                     <div>
+
 
                         <h2>
                             Informações da caixa
                         </h2>
 
+
                         <p>
-                            Dados registrados no momento
-                            do cadastro.
+                            Dados registrados no momento do cadastro.
                         </p>
 
+
                     </div>
+
 
                 </div>
 
@@ -245,94 +269,92 @@
                 <div class="info-grid">
 
 
-                    <!-- VOLUME -->
-
                     <article class="info-card">
+
 
                         <span class="info-label">
                             Volume
                         </span>
 
-                        <strong
-                            id="caixaVolume"
-                            class="info-valor"
-                        >
+
+                        <strong id="caixaVolume" class="info-valor">
                             -
                         </strong>
+
 
                         <span class="info-unidade">
                             litros
                         </span>
 
+
                     </article>
 
 
-                    <!-- HEMOCOMPONENTES -->
-
                     <article class="info-card">
+
 
                         <span class="info-label">
                             Hemocomponentes
                         </span>
 
-                        <strong
-                            id="caixaHemocomponentes"
-                            class="info-valor"
-                        >
+
+                        <strong id="caixaHemocomponentes" class="info-valor">
                             -
                         </strong>
+
 
                         <span class="info-unidade">
                             unidades
                         </span>
 
+
                     </article>
 
 
-                    <!-- GELO -->
-
                     <article class="info-card">
+
 
                         <span class="info-label">
                             Peso do gelo
                         </span>
 
-                        <strong
-                            id="caixaGelo"
-                            class="info-valor"
-                        >
+
+                        <strong id="caixaGelo" class="info-valor">
                             -
                         </strong>
+
 
                         <span class="info-unidade">
                             kg
                         </span>
 
+
                     </article>
 
 
-                    <!-- SENSOR -->
-
                     <article class="info-card">
+
 
                         <span class="info-label">
                             Sensor
                         </span>
 
-                        <strong
-                            id="sensorCodigo"
-                            class="info-valor info-valor-texto"
-                        >
+
+                        <strong id="sensorCodigo" class="info-valor info-valor-texto">
                             -
                         </strong>
+
 
                         <span class="info-unidade">
                             dispositivo
                         </span>
 
+
                     </article>
 
+
                 </div>
+
 
             </section>
 
@@ -343,19 +365,25 @@
 
             <section class="dashboard-secao">
 
+
                 <div class="secao-titulo">
 
+
                     <div>
+
 
                         <h2>
                             Dimensões
                         </h2>
 
+
                         <p>
                             Medidas físicas cadastradas.
                         </p>
 
+
                     </div>
+
 
                 </div>
 
@@ -363,75 +391,85 @@
                 <div class="dados-linha">
 
 
-                    <!-- COMPRIMENTO -->
-
                     <div>
+
 
                         <span>
                             Comprimento
                         </span>
 
+
                         <strong id="caixaComprimento">
                             -
                         </strong>
 
+
                     </div>
 
 
-                    <!-- LARGURA -->
-
                     <div>
+
 
                         <span>
                             Largura
                         </span>
 
+
                         <strong id="caixaLargura">
                             -
                         </strong>
 
+
                     </div>
 
 
-                    <!-- ALTURA -->
-
                     <div>
+
 
                         <span>
                             Altura
                         </span>
 
+
                         <strong id="caixaAltura">
                             -
                         </strong>
 
+
                     </div>
 
+
                 </div>
+
 
             </section>
 
 
             <!-- =================================================
-                 FAIXA DE TEMPERATURA
+                 FAIXA
             ================================================== -->
 
             <section class="dashboard-secao">
 
+
                 <div class="secao-titulo">
 
+
                     <div>
+
 
                         <h2>
                             Faixa de temperatura
                         </h2>
 
+
                         <p>
-                            Limites definidos para
-                            o monitoramento.
+                            Limites definidos para o monitoramento.
                         </p>
 
+
                     </div>
+
 
                 </div>
 
@@ -439,896 +477,725 @@
                 <div class="faixa-temperatura">
 
 
-                    <!-- MÍNIMA -->
-
                     <article class="faixa-card">
+
 
                         <span>
                             Temperatura mínima
                         </span>
 
+
                         <strong id="temperaturaMin">
                             -
                         </strong>
+
 
                     </article>
 
 
                     <div class="faixa-separador">
+
                         até
+
                     </div>
 
 
-                    <!-- MÁXIMA -->
-
                     <article class="faixa-card">
+
 
                         <span>
                             Temperatura máxima
                         </span>
 
+
                         <strong id="temperaturaMax">
                             -
                         </strong>
 
+
                     </article>
 
+
                 </div>
+
 
             </section>
 
 
             <!-- =================================================
-                 MONITORAMENTO / CARDS
+                 FILTRO PRINCIPAL
             ================================================== -->
 
             <section class="dashboard-secao">
 
-                <div
-                    class="secao-titulo secao-titulo-status"
-                >
+
+                <div class="secao-titulo">
+
 
                     <div>
+
+
+                        <h2>
+                            Período analisado
+                        </h2>
+
+
+                        <p>
+                            Escolha quais leituras serão utilizadas
+                            nos cards e no gráfico.
+                        </p>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="filtro-periodo">
+
+
+                    <div class="filtro-campo">
+
+
+                        <label for="filtroPeriodo">
+                            Período
+                        </label>
+
+
+                        <select id="filtroPeriodo">
+
+
+                            <option value="24h">
+                                Últimas 24 horas
+                            </option>
+
+
+                            <option value="hoje">
+                                Hoje
+                            </option>
+
+
+                            <option value="personalizado">
+                                Personalizado
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+                    <div id="periodoPersonalizado" class="periodo-personalizado oculto">
+
+
+                        <div class="filtro-campo">
+
+
+                            <label for="dataInicio">
+                                Início
+                            </label>
+
+
+                            <input type="datetime-local" id="dataInicio">
+
+
+                        </div>
+
+
+                        <div class="filtro-campo">
+
+
+                            <label for="dataFim">
+                                Fim
+                            </label>
+
+
+                            <input type="datetime-local" id="dataFim">
+
+
+                        </div>
+
+
+                        <button type="button" id="btnAplicarPeriodo" class="botao-filtro">
+
+                            Aplicar
+
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <p id="filtroMensagem" class="filtro-mensagem oculto">
+                </p>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 MONITORAMENTO
+            ================================================== -->
+
+            <section class="dashboard-secao">
+
+
+                <div class="secao-titulo secao-titulo-status">
+
+
+                    <div>
+
 
                         <h2>
                             Monitoramento
                         </h2>
 
+
                         <p>
-                            Resumo das temperaturas
-                            registradas para esta caixa.
+                            Resumo das temperaturas registradas
+                            para esta caixa.
                         </p>
+
 
                     </div>
 
 
-                    <span
-                        id="statusTemperatura"
-                        class="status-temperatura status-sem-dados"
-                    >
+                    <span id="statusTemperatura" class="status-temperatura status-sem-dados">
+
                         Carregando...
+
                     </span>
+
 
                 </div>
 
 
-                <!-- =============================================
-                     MÉTRICAS PRINCIPAIS
-                ============================================== -->
+                <!-- MÉTRICAS PRINCIPAIS -->
 
                 <div class="metricas-grid">
 
 
-                    <!-- ATUAL -->
+                    <article class="metrica-card metrica-destaque">
 
-                    <article
-                        class="metrica-card metrica-destaque"
-                    >
 
                         <span class="metrica-label">
                             Atual
                         </span>
 
-                        <strong
-                            id="metricaAtual"
-                            class="metrica-valor"
-                        >
+
+                        <strong id="metricaAtual" class="metrica-valor">
                             --
                         </strong>
+
 
                         <span class="metrica-descricao">
                             Última leitura
                         </span>
 
+
                     </article>
 
 
-                    <!-- MÍNIMA -->
-
                     <article class="metrica-card">
+
 
                         <span class="metrica-label">
                             Mínima
                         </span>
 
-                        <strong
-                            id="metricaMinima"
-                            class="metrica-valor"
-                        >
+
+                        <strong id="metricaMinima" class="metrica-valor">
                             --
                         </strong>
+
 
                         <span class="metrica-descricao">
                             Menor registrada
                         </span>
 
+
                     </article>
 
 
-                    <!-- MÁXIMA -->
-
                     <article class="metrica-card">
+
 
                         <span class="metrica-label">
                             Máxima
                         </span>
 
-                        <strong
-                            id="metricaMaxima"
-                            class="metrica-valor"
-                        >
+
+                        <strong id="metricaMaxima" class="metrica-valor">
                             --
                         </strong>
+
 
                         <span class="metrica-descricao">
                             Maior registrada
                         </span>
 
+
                     </article>
 
 
-                    <!-- MÉDIA -->
-
                     <article class="metrica-card">
+
 
                         <span class="metrica-label">
                             Média
                         </span>
 
-                        <strong
-                            id="metricaMedia"
-                            class="metrica-valor"
-                        >
+
+                        <strong id="metricaMedia" class="metrica-valor">
                             --
                         </strong>
+
 
                         <span class="metrica-descricao">
                             Média do período
                         </span>
 
+
                     </article>
+
 
                 </div>
 
 
-                <!-- =============================================
-                     MÉTRICAS SECUNDÁRIAS
-                ============================================== -->
+                <!-- MÉTRICAS SECUNDÁRIAS -->
 
                 <div class="metricas-secundarias">
 
 
-                    <!-- TOTAL -->
-
                     <div>
+
 
                         <span>
                             Registros
                         </span>
 
+
                         <strong id="metricaTotal">
                             0
                         </strong>
 
+
                     </div>
 
 
-                    <!-- DENTRO -->
-
                     <div>
+
 
                         <span>
                             Dentro da faixa
                         </span>
 
+
                         <strong id="metricaDentroFaixa">
                             0
                         </strong>
 
+
                     </div>
 
 
-                    <!-- FORA -->
-
                     <div>
+
 
                         <span>
                             Fora da faixa
                         </span>
 
+
                         <strong id="metricaForaFaixa">
                             0
                         </strong>
 
+
                     </div>
 
 
-                    <!-- PERCENTUAL -->
-
                     <div>
+
 
                         <span>
                             Período seguro
                         </span>
 
-                        <strong
-                            id="metricaPercentualSeguro"
-                        >
+
+                        <strong id="metricaPercentualSeguro">
                             0%
                         </strong>
 
+
                     </div>
 
+
                 </div>
+
 
             </section>
 
 
             <!-- =================================================
-                 GRÁFICO
+                 GRÁFICO PRINCIPAL
             ================================================== -->
 
             <section class="dashboard-secao">
 
+
                 <div class="secao-titulo">
 
+
                     <div>
+
 
                         <h2>
                             Histórico de temperatura
                         </h2>
 
+
                         <p>
-                            Variação das temperaturas
-                            registradas nesta caixa.
+                            Variação das temperaturas registradas
+                            nesta caixa.
                         </p>
 
+
                     </div>
+
 
                 </div>
 
 
-                <!-- INFORMAÇÕES DO GRÁFICO -->
-
                 <div class="grafico-legenda-info">
+
 
                     <span>
                         Linha contínua:
                         temperatura registrada
                     </span>
 
+
                     <span>
                         Linhas tracejadas:
                         limites permitidos
                     </span>
 
+
                 </div>
 
 
-                <!-- GRÁFICO -->
+                <div id="graficoTemperatura" class="grafico-temperatura">
+                </div>
 
-                <div
-                    id="graficoTemperatura"
-                    class="grafico-temperatura"
-                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 COMPARATIVO
+            ================================================== -->
+
+            <section class="dashboard-secao">
+
+
+                <div class="secao-titulo">
+
+
+                    <div>
+
+
+                        <h2>
+                            Comparativo de períodos
+                        </h2>
+
+
+                        <p>
+                            Compare o comportamento térmico da caixa
+                            em dois intervalos diferentes.
+                        </p>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- PERÍODOS -->
+
+                <div class="comparativo-periodos">
+
+
+                    <!-- PERÍODO A -->
+
+                    <div class="comparativo-periodo">
+
+
+                        <h3>
+                            Período A
+                        </h3>
+
+
+                        <div class="filtro-campo">
+
+
+                            <label for="comparativoInicioA">
+                                Início
+                            </label>
+
+
+                            <input type="datetime-local" id="comparativoInicioA">
+
+
+                        </div>
+
+
+                        <div class="filtro-campo">
+
+
+                            <label for="comparativoFimA">
+                                Fim
+                            </label>
+
+
+                            <input type="datetime-local" id="comparativoFimA">
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- PERÍODO B -->
+
+                    <div class="comparativo-periodo">
+
+
+                        <h3>
+                            Período B
+                        </h3>
+
+
+                        <div class="filtro-campo">
+
+
+                            <label for="comparativoInicioB">
+                                Início
+                            </label>
+
+
+                            <input type="datetime-local" id="comparativoInicioB">
+
+
+                        </div>
+
+
+                        <div class="filtro-campo">
+
+
+                            <label for="comparativoFimB">
+                                Fim
+                            </label>
+
+
+                            <input type="datetime-local" id="comparativoFimB">
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <button type="button" id="btnComparar" class="botao-filtro botao-comparar">
+
+                    Comparar períodos
+
+                </button>
+
+
+                <p id="comparativoMensagem" class="filtro-mensagem oculto">
+                </p>
+
+
+                <!-- =============================================
+                     RESULTADO
+                ============================================== -->
+
+                <div id="comparativoResultado" class="comparativo-resultado oculto">
+
+
+                    <div class="comparativo-cards">
+
+
+                        <!-- MÍNIMA -->
+
+                        <article class="comparativo-card">
+
+
+                            <span>
+                                Mínima
+                            </span>
+
+
+                            <div>
+
+
+                                <p>
+
+                                    A:
+
+                                    <strong id="comparativoMinimaA">
+                                        -
+                                    </strong>
+
+                                </p>
+
+
+                                <p>
+
+                                    B:
+
+                                    <strong id="comparativoMinimaB">
+                                        -
+                                    </strong>
+
+                                </p>
+
+
+                            </div>
+
+
+                            <small id="comparativoMinimaDiferenca">
+                                -
+                            </small>
+
+
+                        </article>
+
+
+                        <!-- MÉDIA -->
+
+                        <article class="comparativo-card">
+
+
+                            <span>
+                                Média
+                            </span>
+
+
+                            <div>
+
+
+                                <p>
+
+                                    A:
+
+                                    <strong id="comparativoMediaA">
+                                        -
+                                    </strong>
+
+                                </p>
+
+
+                                <p>
+
+                                    B:
+
+                                    <strong id="comparativoMediaB">
+                                        -
+                                    </strong>
+
+                                </p>
+
+
+                            </div>
+
+
+                            <small id="comparativoMediaDiferenca">
+                                -
+                            </small>
+
+
+                        </article>
+
+
+                        <!-- MÁXIMA -->
+
+                        <article class="comparativo-card">
+
+
+                            <span>
+                                Máxima
+                            </span>
+
+
+                            <div>
+
+
+                                <p>
+
+                                    A:
+
+                                    <strong id="comparativoMaximaA">
+                                        -
+                                    </strong>
+
+                                </p>
+
+
+                                <p>
+
+                                    B:
+
+                                    <strong id="comparativoMaximaB">
+                                        -
+                                    </strong>
+
+                                </p>
+
+
+                            </div>
+
+
+                            <small id="comparativoMaximaDiferenca">
+                                -
+                            </small>
+
+
+                        </article>
+
+
+                    </div>
+
+
+                    <!-- GRÁFICO COMPARATIVO -->
+
+                    <div id="graficoComparativo" class="grafico-comparativo">
+                    </div>
+
+
+                </div>
+
 
             </section>
 
 
         </div>
+
 
     </main>
 
-    <!-- =====================================================
-         TOPO
-    ====================================================== -->
-
-    <header class="topo">
-
-        <div class="topo-conteudo">
-
-            <div class="marca">
-
-                <div class="marca-icone">
-                    T
-                </div>
-
-                <div class="marca-texto">
-
-                    <strong>
-                        Monitoramento Térmico
-                    </strong>
-
-                    <span>
-                        Dashboard da caixa
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <a href="./index.html" class="botao-voltar">
-                Nova caixa
-            </a>
-
-        </div>
-
-    </header>
-
-
-    <!-- =====================================================
-         PÁGINA
-    ====================================================== -->
-
-    <main class="dashboard">
-
-        <!-- CARREGANDO -->
-
-        <section id="dashboardCarregando" class="dashboard-estado">
-
-            <span class="carregando-spinner"></span>
-
-            <p>
-                Carregando dados da caixa...
-            </p>
-
-        </section>
-
-
-        <!-- ERRO -->
-
-        <section id="dashboardErro" class="dashboard-estado dashboard-erro oculto">
-
-            <strong>
-                Não foi possível carregar a caixa.
-            </strong>
-
-            <p id="dashboardErroMensagem">
-            </p>
-
-            <a href="./index.html" class="botao botao-secundario">
-                Voltar ao cadastro
-            </a>
-
-        </section>
-
-
-        <!-- CONTEÚDO -->
-
-        <div id="dashboardConteudo" class="oculto">
-
-            <!-- CABEÇALHO -->
-
-            <section class="dashboard-cabecalho">
-
-                <div>
-
-                    <span class="etiqueta">
-                        Caixa monitorada
-                    </span>
-
-                    <h1 id="caixaNome">
-                        -
-                    </h1>
-
-                    <div class="caixa-identificacao">
-
-                        <span>
-                            Código:
-                            <strong id="caixaCodigo">
-                                -
-                            </strong>
-                        </span>
-
-                        <span>
-                            ID:
-                            <strong id="caixaId">
-                                -
-                            </strong>
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div id="sensorStatus" class="sensor-status">
-
-                    <span class="sensor-status-ponto"></span>
-
-                    <div>
-
-                        <small>
-                            Sensor associado
-                        </small>
-
-                        <strong id="sensorNome">
-                            -
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 INFORMAÇÕES DA CAIXA
-            ================================================== -->
-
-            <section class="dashboard-secao">
-
-                <div class="secao-titulo">
-
-                    <div>
-                        <h2>
-                            Informações da caixa
-                        </h2>
-
-                        <p>
-                            Dados registrados no momento do cadastro.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <div class="info-grid">
-
-                    <!-- VOLUME -->
-
-                    <article class="info-card">
-
-                        <span class="info-label">
-                            Volume
-                        </span>
-
-                        <strong id="caixaVolume" class="info-valor">
-                            -
-                        </strong>
-
-                        <span class="info-unidade">
-                            litros
-                        </span>
-
-                    </article>
-
-
-                    <!-- HEMOCOMPONENTES -->
-
-                    <article class="info-card">
-
-                        <span class="info-label">
-                            Hemocomponentes
-                        </span>
-
-                        <strong id="caixaHemocomponentes" class="info-valor">
-                            -
-                        </strong>
-
-                        <span class="info-unidade">
-                            unidades
-                        </span>
-
-                    </article>
-
-
-                    <!-- GELO -->
-
-                    <article class="info-card">
-
-                        <span class="info-label">
-                            Peso do gelo
-                        </span>
-
-                        <strong id="caixaGelo" class="info-valor">
-                            -
-                        </strong>
-
-                        <span class="info-unidade">
-                            kg
-                        </span>
-
-                    </article>
-
-
-                    <!-- SENSOR -->
-
-                    <article class="info-card">
-
-                        <span class="info-label">
-                            Sensor
-                        </span>
-
-                        <strong id="sensorCodigo" class="info-valor info-valor-texto">
-                            -
-                        </strong>
-
-                        <span class="info-unidade">
-                            dispositivo
-                        </span>
-
-                    </article>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 DIMENSÕES
-            ================================================== -->
-
-            <section class="dashboard-secao">
-
-                <div class="secao-titulo">
-
-                    <div>
-
-                        <h2>
-                            Dimensões
-                        </h2>
-
-                        <p>
-                            Medidas físicas cadastradas.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="dados-linha">
-
-                    <div>
-
-                        <span>
-                            Comprimento
-                        </span>
-
-                        <strong id="caixaComprimento">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            Largura
-                        </span>
-
-                        <strong id="caixaLargura">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            Altura
-                        </span>
-
-                        <strong id="caixaAltura">
-                            -
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 FAIXA TÉRMICA
-            ================================================== -->
-
-            <section class="dashboard-secao">
-
-                <div class="secao-titulo">
-
-                    <div>
-
-                        <h2>
-                            Faixa de temperatura
-                        </h2>
-
-                        <p>
-                            Limites definidos para o monitoramento.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="faixa-temperatura">
-
-                    <article class="faixa-card">
-
-                        <span>
-                            Temperatura mínima
-                        </span>
-
-                        <strong id="temperaturaMin">
-                            -
-                        </strong>
-
-                    </article>
-
-
-                    <div class="faixa-separador">
-                        até
-                    </div>
-
-
-                    <article class="faixa-card">
-
-                        <span>
-                            Temperatura máxima
-                        </span>
-
-                        <strong id="temperaturaMax">
-                            -
-                        </strong>
-
-                    </article>
-
-                </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 TEMPERATURA — PLACEHOLDER
-            ================================================== -->
-
-            <section class="dashboard-secao">
-
-                <div class="secao-titulo">
-
-                    <div>
-
-                        <h2>
-                            Monitoramento
-                        </h2>
-
-                    </div>
-
-                </div>
-
-                <div class="monitoramento-placeholder">
-
-                    <section class="dashboard-secao">
-
-                        <div class="secao-titulo secao-titulo-status">
-
-                            <div>
-
-                                <h2>
-                                    Monitoramento
-                                </h2>
-
-                                <p>
-                                    Resumo das temperaturas registradas
-                                    para esta caixa.
-                                </p>
-
-                            </div>
-
-
-                            <span id="statusTemperatura" class="status-temperatura status-sem-dados">
-                                Carregando...
-                            </span>
-
-                        </div>
-
-
-                        <!-- MÉTRICAS PRINCIPAIS -->
-
-                        <div class="metricas-grid">
-
-                            <article class="metrica-card metrica-destaque">
-
-                                <span class="metrica-label">
-                                    Atual
-                                </span>
-
-                                <strong id="metricaAtual" class="metrica-valor">
-                                    --
-                                </strong>
-
-                                <span class="metrica-descricao">
-                                    Última leitura
-                                </span>
-
-                            </article>
-
-
-                            <article class="metrica-card">
-
-                                <span class="metrica-label">
-                                    Mínima
-                                </span>
-
-                                <strong id="metricaMinima" class="metrica-valor">
-                                    --
-                                </strong>
-
-                                <span class="metrica-descricao">
-                                    Menor registrada
-                                </span>
-
-                            </article>
-
-
-                            <article class="metrica-card">
-
-                                <span class="metrica-label">
-                                    Máxima
-                                </span>
-
-                                <strong id="metricaMaxima" class="metrica-valor">
-                                    --
-                                </strong>
-
-                                <span class="metrica-descricao">
-                                    Maior registrada
-                                </span>
-
-                            </article>
-
-
-                            <article class="metrica-card">
-
-                                <span class="metrica-label">
-                                    Média
-                                </span>
-
-                                <strong id="metricaMedia" class="metrica-valor">
-                                    --
-                                </strong>
-
-                                <span class="metrica-descricao">
-                                    Média do período
-                                </span>
-
-                            </article>
-
-                        </div>
-
-
-                        <!-- RESUMO DOS REGISTROS -->
-
-                        <div class="metricas-secundarias">
-
-                            <div>
-
-                                <span>
-                                    Registros
-                                </span>
-
-                                <strong id="metricaTotal">
-                                    0
-                                </strong>
-
-                            </div>
-
-
-                            <div>
-
-                                <span>
-                                    Dentro da faixa
-                                </span>
-
-                                <strong id="metricaDentroFaixa">
-                                    0
-                                </strong>
-
-                            </div>
-
-
-                            <div>
-
-                                <span>
-                                    Fora da faixa
-                                </span>
-
-                                <strong id="metricaForaFaixa">
-                                    0
-                                </strong>
-
-                            </div>
-
-
-                            <div>
-
-                                <span>
-                                    Período seguro
-                                </span>
-
-                                <strong id="metricaPercentualSeguro">
-                                    0%
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                    <section class="dashboard-secao">
-
-                        <div class="secao-titulo">
-
-                            <div>
-
-                                <h2>
-                                    Histórico de temperatura
-                                </h2>
-
-                                <p>
-                                    Variação das temperaturas registradas
-                                    nesta caixa.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="grafico-legenda-info">
-
-                            <span>
-                                Linha contínua:
-                                temperatura registrada
-                            </span>
-
-                            <span>
-                                Linhas tracejadas:
-                                limites permitidos
-                            </span>
-
-                        </div>
-
-
-                        <div id="graficoTemperatura" class="grafico-temperatura"></div>
-
-                    </section>
-
-                </div>
-
-            </section>
-
-        </div>
-
-    </main>
 
 </body>
 

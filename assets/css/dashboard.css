@@ -914,3 +914,327 @@
     }
 
 }
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+.filtro-periodo {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+}
+
+
+.filtro-campo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.filtro-campo label {
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.filtro-campo select,
+.filtro-campo input {
+
+    min-height: 42px;
+
+    padding: 8px 12px;
+
+    border:
+        1px solid var(--cor-borda);
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background: white;
+}
+
+
+.periodo-personalizado {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+}
+
+
+.botao-filtro {
+
+    min-height: 42px;
+
+    padding: 0 18px;
+
+    border: none;
+
+    border-radius:
+        var(--raio-pequeno);
+
+    background:
+        var(--cor-primaria);
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+
+.botao-filtro:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+.filtro-mensagem {
+
+    margin-top: 12px;
+
+    color: #b91c1c;
+
+    font-size: 11px;
+}
+
+
+@media (max-width: 600px) {
+
+    .filtro-periodo,
+    .periodo-personalizado {
+
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .filtro-campo {
+
+        width: 100%;
+    }
+
+
+    .botao-filtro {
+
+        width: 100%;
+    }
+
+}
+
+/* =========================================================
+   COMPARATIVO
+========================================================= */
+
+.comparativo-periodos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 20px;
+
+    margin-bottom: 18px;
+}
+
+
+.comparativo-periodo {
+
+    padding: 18px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 14px;
+
+    border:
+        1px solid var(--cor-borda);
+
+    border-radius:
+        var(--raio-medio);
+
+    background:
+        #f8fafc;
+}
+
+
+.comparativo-periodo h3 {
+
+    grid-column:
+        1 / -1;
+
+    font-size:
+        14px;
+}
+
+
+.botao-comparar {
+
+    margin-bottom:
+        5px;
+}
+
+
+.comparativo-resultado {
+
+    margin-top:
+        25px;
+}
+
+
+.comparativo-cards {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        15px;
+
+    margin-bottom:
+        25px;
+}
+
+
+.comparativo-card {
+
+    padding:
+        18px;
+
+    border:
+        1px solid var(--cor-borda);
+
+    border-radius:
+        var(--raio-medio);
+
+    background:
+        #f8fafc;
+}
+
+
+.comparativo-card > span {
+
+    display:
+        block;
+
+    margin-bottom:
+        10px;
+
+    color:
+        var(--cor-texto-secundario);
+
+    font-size:
+        11px;
+
+    font-weight:
+        600;
+}
+
+
+.comparativo-card p {
+
+    margin:
+        4px 0;
+
+    font-size:
+        13px;
+}
+
+
+.comparativo-card small {
+
+    display:
+        block;
+
+    margin-top:
+        10px;
+
+    font-weight:
+        600;
+}
+
+
+.grafico-comparativo {
+
+    width:
+        100%;
+
+    height:
+        360px;
+}
+
+
+@media (
+    max-width: 800px
+) {
+
+    .comparativo-periodos {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .comparativo-cards {
+
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+@media (
+    max-width: 600px
+) {
+
+    .comparativo-periodo {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .grafico-comparativo {
+
+        height:
+            300px;
+    }
+
+}

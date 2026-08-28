@@ -129,3 +129,83 @@ export async function buscarUltimaTemperatura(
 
     return data;
 }
+
+/* =========================================================
+   BUSCAR TEMPERATURAS POR PERÍODO
+========================================================= */
+
+export async function buscarTemperaturasPorPeriodo(
+    caixaId,
+    inicio,
+    fim
+) {
+
+    if (
+        !Number.isInteger(caixaId) ||
+        caixaId <= 0
+    ) {
+
+        throw new Error(
+            "ID da caixa inválido."
+        );
+    }
+
+
+    if (
+        !inicio ||
+        !fim
+    ) {
+
+        throw new Error(
+            "Período não informado."
+        );
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("temperaturas")
+        .select(`
+            id,
+            valor,
+            data,
+            caixa_id,
+            sensor_id
+        `)
+        .eq(
+            "caixa_id",
+            caixaId
+        )
+        .gte(
+            "data",
+            inicio
+        )
+        .lte(
+            "data",
+            fim
+        )
+        .order(
+            "data",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "[TEMPERATURA SERVICE] Erro ao buscar período:",
+            error
+        );
+
+        throw new Error(
+            "Não foi possível carregar as temperaturas do período."
+        );
+    }
+
+
+    return data;
+}
