@@ -1,5 +1,5 @@
-import { CHAVE_SESSAO_PORTAL, supabase } from "../config/supabase.js?v=implantacao-1";
-import { destinoAposLogin } from "../config/acesso.js?v=admin-1";
+import { supabase } from "../config/supabase.js?v=sessao-1";
+import { destinoAposLogin, registrarSessao } from "../config/acesso.js?v=sessao-1";
 
 const form = document.getElementById("formLogin");
 const botao = form.querySelector("button");
@@ -26,7 +26,7 @@ form.addEventListener("submit", async evento => {
             return;
         }
 
-        sessionStorage.setItem(CHAVE_SESSAO_PORTAL, token);
+        registrarSessao(token);
         form.reset();
         location.replace(destinoAposLogin());
     } catch {

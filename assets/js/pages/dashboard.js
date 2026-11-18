@@ -4,18 +4,18 @@
 
 import {
     buscarCaixaPorId
-} from "../services/caixaService.js?v=implantacao-1";
+} from "../services/caixaService.js?v=sessao-1";
 
-import { protegerPagina } from "../config/acesso.js?v=admin-1";
+import { protegerPagina } from "../config/acesso.js?v=sessao-1";
 
 import {
     buscarSensorPorCaixa
-} from "../services/sensorService.js?v=implantacao-1";
+} from "../services/sensorService.js?v=sessao-1";
 
 
 import {
     buscarTemperaturasPorPeriodo
-} from "../services/temperaturaService.js?v=implantacao-1";
+} from "../services/temperaturaService.js?v=sessao-1";
 
 
 import {

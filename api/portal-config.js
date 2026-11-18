@@ -22,5 +22,6 @@ export default function handler(req, res) {
         return res.status(503).json({ erro: "Configuração do Supabase indisponível para este ambiente." });
     }
 
+    res.setHeader("Cache-Control", "private, max-age=300");
     return res.status(200).json({ url, chave });
 }

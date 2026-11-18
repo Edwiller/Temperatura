@@ -1,5 +1,5 @@
-import { protegerPagina } from "../config/acesso.js?v=admin-1";
-import { supabase } from "../config/supabase.js?v=implantacao-1";
+import { protegerPagina } from "../config/acesso.js?v=sessao-1";
+import { supabase } from "../config/supabase.js?v=sessao-1";
 
 const lista = document.getElementById("listaPendencias");
 const estado = document.getElementById("estadoPendencias");

@@ -1,5 +1,5 @@
-import { protegerPagina } from "../config/acesso.js?v=admin-1";
-import { listarCaixas } from "../services/caixaService.js?v=implantacao-1";
+import { protegerPagina } from "../config/acesso.js?v=sessao-1";
+import { listarCaixas } from "../services/caixaService.js?v=sessao-1";
 
 const filtro = document.getElementById("buscarCaixa");
 const estado = document.getElementById("estadoCaixas");

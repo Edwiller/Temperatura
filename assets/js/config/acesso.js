@@ -1,8 +1,41 @@
-import { CHAVE_SESSAO_PORTAL, supabase } from "./supabase.js?v=implantacao-1";
+import { CHAVE_SESSAO_PORTAL, supabase } from "./supabase.js?v=sessao-1";
 import { configurarTemaPortal } from "../components/temaPortal.js";
 
 const raiz = new URL("../../../", import.meta.url);
 const paginas = new Set(["", "index.html", "caixas.html", "cadastro.html", "dashboard.html", "administrador.html"]);
+const chavePerfil = "temperatura.portal.perfil";
+const intervaloDaSessao = 2 * 60 * 1000;
+
+export function registrarSessao(token) {
+    sessionStorage.removeItem(chavePerfil);
+    sessionStorage.setItem(CHAVE_SESSAO_PORTAL, token);
+}
+
+function limparSessao() {
+    sessionStorage.removeItem(chavePerfil);
+    sessionStorage.removeItem(CHAVE_SESSAO_PORTAL);
+}
+
+function lerPerfilDaSessao(token) {
+    try {
+        const cache = JSON.parse(sessionStorage.getItem(chavePerfil));
+        return cache?.token === token && ["admin", "operador"].includes(cache?.perfil)
+            && Number.isFinite(cache?.validadoEm) ? cache : null;
+    } catch {
+        return null;
+    }
+}
+
+async function consultarPerfilDaSessao(token) {
+    const { data: perfil, error } = await supabase.rpc("portal_perfil_sessao");
+    if (error) throw error;
+    if (sessionStorage.getItem(CHAVE_SESSAO_PORTAL) !== token
+        || !["admin", "operador"].includes(perfil)) return null;
+
+    const sessao = { token, perfil, validadoEm: Date.now() };
+    sessionStorage.setItem(chavePerfil, JSON.stringify(sessao));
+    return sessao;
+}
 
 export function destinoAposLogin() {
     const voltar = new URLSearchParams(location.search).get("voltar");
@@ -29,18 +62,19 @@ export async function protegerPagina(secao) {
 
     try {
         if (!supabase) throw new Error("Configuração do portal indisponível.");
-        if (!sessionStorage.getItem(CHAVE_SESSAO_PORTAL)) {
+        const token = sessionStorage.getItem(CHAVE_SESSAO_PORTAL);
+        if (!token) {
             abrirLogin();
             return false;
         }
 
-        const { data: perfil, error } = await supabase.rpc("portal_perfil_sessao");
-        if (error) throw error;
-        if (!["admin", "operador"].includes(perfil)) {
-            sessionStorage.removeItem(CHAVE_SESSAO_PORTAL);
+        let sessao = lerPerfilDaSessao(token) ?? await consultarPerfilDaSessao(token);
+        if (!sessao) {
+            limparSessao();
             abrirLogin();
             return false;
         }
+        const { perfil } = sessao;
 
         cabecalho.className = "portal-topo";
         cabecalho.innerHTML = `
@@ -63,11 +97,35 @@ export async function protegerPagina(secao) {
         configurarTemaPortal(cabecalho.querySelector("[data-portal-theme]"));
 
         function encerrarInterface() {
-            sessionStorage.removeItem(CHAVE_SESSAO_PORTAL);
+            limparSessao();
             cabecalho.hidden = true;
             conteudo.hidden = true;
             abrirLogin();
         }
+
+        let revalidando = false;
+        async function revalidarEmSegundoPlano() {
+            if (document.hidden || revalidando || Date.now() - sessao.validadoEm < intervaloDaSessao
+                || sessionStorage.getItem(CHAVE_SESSAO_PORTAL) !== token) return;
+
+            revalidando = true;
+            try {
+                const atualizada = await consultarPerfilDaSessao(token);
+                // Uma saída ou um novo login pode ocorrer enquanto a consulta está em andamento.
+                if (sessionStorage.getItem(CHAVE_SESSAO_PORTAL) !== token) return;
+                if (!atualizada) encerrarInterface();
+                else if (atualizada.perfil !== perfil) location.reload();
+                else sessao = atualizada;
+            } catch {
+                // Uma falha de rede não encerra uma sessão válida. A próxima checagem tenta novamente.
+            } finally {
+                revalidando = false;
+            }
+        }
+
+        window.setInterval(revalidarEmSegundoPlano, 30000);
+        document.addEventListener("visibilitychange", revalidarEmSegundoPlano);
+        void revalidarEmSegundoPlano();
 
         window.addEventListener("pagehide", () => {
             cabecalho.hidden = true;
@@ -95,6 +153,7 @@ export async function protegerPagina(secao) {
         cabecalho.hidden = false;
         if (secao === "admin" && perfil !== "admin") {
             status.textContent = "Acesso restrito a administradores.";
+            status.hidden = false;
             return false;
         }
 
@@ -102,7 +161,8 @@ export async function protegerPagina(secao) {
         conteudo.hidden = false;
         return true;
     } catch {
-        status.textContent = "Não foi possível verificar seu acesso. Recarregue a página para tentar novamente.";
+        status.textContent = "Não foi possível abrir o portal. Recarregue a página para tentar novamente.";
+        status.hidden = false;
         return false;
     }
 }

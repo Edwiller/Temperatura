@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabase.js?v=implantacao-1";
+import { supabase } from "../config/supabase.js?v=sessao-1";
 
 const form = document.getElementById("formUsuario");
 const botao = form.querySelector("button");

@@ -1,6 +1,6 @@
 import {
     supabase
-} from "../config/supabase.js?v=implantacao-1";
+} from "../config/supabase.js?v=sessao-1";
 
 async function buscarPaginas(consulta) {
     const registros = [];

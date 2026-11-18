@@ -1,6 +1,6 @@
-import { protegerPagina } from "../config/acesso.js?v=admin-1";
-import { listarCaixas } from "../services/caixaService.js?v=implantacao-1";
-import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=implantacao-1";
+import { protegerPagina } from "../config/acesso.js?v=sessao-1";
+import { listarCaixas } from "../services/caixaService.js?v=sessao-1";
+import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=sessao-1";
 import { coresGrafico, eventoTemaPortal } from "../components/temaPortal.js?v=grafico-1";
 import {
     dataDasLeituras, diaDasLeiturasNaUrl, fusoDasLeituras, inicioDoDiaNoAcre,
