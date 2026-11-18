@@ -28,10 +28,29 @@ export function obterConfiguracaoSupabase() {
     return configuracao;
 }
 
+function carregarBiblioteca() {
+    if (globalThis.supabase?.createClient) return Promise.resolve(globalThis.supabase);
+
+    return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = new URL("../vendor/supabase-2.119.1.js", import.meta.url);
+        function falhar() {
+            script.remove();
+            reject(new Error("Não foi possível carregar a conexão com o portal. Recarregue a página."));
+        }
+        script.addEventListener("load", () => {
+            if (globalThis.supabase?.createClient) resolve(globalThis.supabase);
+            else falhar();
+        }, { once: true });
+        script.addEventListener("error", falhar, { once: true });
+        document.head.append(script);
+    });
+}
+
 async function criarCliente() {
     const [config, { createClient }] = await Promise.all([
         obterConfiguracaoSupabase(),
-        import("https://esm.sh/@supabase/supabase-js@2")
+        carregarBiblioteca()
     ]);
 
     return createClient(config.url, config.chave, {
