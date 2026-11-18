@@ -1,4 +1,4 @@
-import { obterSupabase } from "../config/supabase.js?v=desempenho-1";
+import { obterSupabase } from "../config/supabase.js?v=fluxo-sessao-1";
 
 const form = document.getElementById("formUsuario");
 const botao = form.querySelector("button");

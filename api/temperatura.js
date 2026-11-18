@@ -562,318 +562,35 @@ export default async function handler(
         }
 
 
-        /* =================================================
-           8. BUSCAR SENSOR
-        ================================================= */
-
-        const sensorUrl =
-            new URL(
-                `${supabaseUrl}/rest/v1/sensores`
-            );
-
-
-        sensorUrl.searchParams.set(
-            "codigo",
-            `eq.${sensorCodigo}`
-        );
-
-
-        sensorUrl.searchParams.set(
-            "select",
-            "id,codigo,nome,ativo,caixa_id"
-        );
-
-
-        sensorUrl.searchParams.set(
-            "limit",
-            "1"
-        );
-
-
-        const sensorResponse =
-            await chamarSupabase(
-                sensorUrl,
-                {
-
-                    method:
-                        "GET",
-
-                    headers: {
-
-                        apikey:
-                            supabaseSecretKey,
-
-                        Accept:
-                            "application/json"
-
-                    }
-
-                }
-            );
-
-
-        let sensores;
-
-
+        const resposta = await chamarSupabase(`${supabaseUrl}/rest/v1/rpc/registrar_leitura_sensor`, {
+            method: "POST",
+            headers: { apikey: supabaseSecretKey, "Content-Type": "application/json" },
+            body: JSON.stringify({ p_codigo: sensorCodigo, p_valor: valor })
+        });
+        let registro;
         try {
-
-            sensores =
-                await sensorResponse.json();
-
-
+            registro = await resposta.json();
         } catch (erro) {
-
-            console.error(
-                "[API TEMPERATURA] Resposta inválida do Supabase:",
-                erro
-            );
-
-
-            return responder(
-                res,
-                502,
-                {
-                    sucesso: false,
-                    erro:
-                        "Resposta inválida recebida do banco de dados."
-                }
-            );
-
+            console.error("[API TEMPERATURA] Resposta inválida do Supabase:", erro);
+            return responder(res, 502, { sucesso: false, erro: "Resposta inválida recebida do banco de dados." });
+        }
+        if (registro?.status === "desconhecido") {
+            return responder(res, 404, { sucesso: false, erro: `Sensor ${sensorCodigo} não encontrado.` });
+        }
+        if (registro?.status === "inativo") {
+            return responder(res, 409, { sucesso: false, erro: "O sensor está inativo." });
+        }
+        if (registro?.status !== "gravado") {
+            return responder(res, 502, { sucesso: false, erro: "O banco não retornou a temperatura criada." });
         }
 
-
-        /* =================================================
-           9. SENSOR NÃO ENCONTRADO
-        ================================================= */
-
-        if (
-            !Array.isArray(
-                sensores
-            ) ||
-            sensores.length === 0
-        ) {
-
-            return responder(
-                res,
-                404,
-                {
-                    sucesso: false,
-                    erro:
-                        `Sensor ${sensorCodigo} não encontrado.`
-                }
-            );
-
-        }
-
-
-        const sensor =
-            sensores[0];
-
-
-        /* =================================================
-           10. SENSOR INATIVO
-        ================================================= */
-
-        if (
-            sensor.ativo !==
-            true
-        ) {
-
-            return responder(
-                res,
-                409,
-                {
-                    sucesso: false,
-                    erro:
-                        "O sensor está inativo."
-                }
-            );
-
-        }
-
-
-        /* =================================================
-           11. SENSOR SEM CAIXA
-        ================================================= */
-
-        if (
-            sensor.caixa_id ===
-            null ||
-            sensor.caixa_id ===
-            undefined
-        ) {
-
-            return responder(
-                res,
-                409,
-                {
-                    sucesso: false,
-                    erro:
-                        "O sensor não está associado a nenhuma caixa."
-                }
-            );
-
-        }
-
-
-        /* =================================================
-           12. INSERIR TEMPERATURA
-        ================================================= */
-
-        const temperaturaResponse =
-            await chamarSupabase(
-                `${supabaseUrl}/rest/v1/temperaturas`,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        apikey:
-                            supabaseSecretKey,
-
-                        "Content-Type":
-                            "application/json",
-
-                        Prefer:
-                            "return=representation"
-
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            valor,
-
-                            caixa_id:
-                                sensor.caixa_id,
-
-                            sensor_id:
-                                sensor.id
-
-                        })
-
-                }
-            );
-
-
-        let registros;
-
-
-        try {
-
-            registros =
-                await temperaturaResponse
-                    .json();
-
-
-        } catch (erro) {
-
-            console.error(
-                "[API TEMPERATURA] Resposta do INSERT inválida:",
-                erro
-            );
-
-
-            return responder(
-                res,
-                502,
-                {
-                    sucesso: false,
-                    erro:
-                        "Resposta inválida recebida após registrar a temperatura."
-                }
-            );
-
-        }
-
-
-        if (
-            !Array.isArray(
-                registros
-            ) ||
-            registros.length === 0
-        ) {
-
-            console.error(
-                "[API TEMPERATURA] INSERT não retornou registro."
-            );
-
-
-            return responder(
-                res,
-                502,
-                {
-                    sucesso: false,
-                    erro:
-                        "O banco não retornou a temperatura criada."
-                }
-            );
-
-        }
-
-
-        const temperaturaCriada =
-            registros[0];
-
-
-        /* =================================================
-           13. LOG
-        ================================================= */
-
-        console.log(
-            `[API TEMPERATURA] ${sensor.codigo} → ${valor} °C → caixa ${sensor.caixa_id}`
-        );
-
-
-        /* =================================================
-           14. SUCESSO
-        ================================================= */
-
-        return responder(
-            res,
-            201,
-            {
-
-                sucesso: true,
-
-                mensagem:
-                    "Temperatura registrada com sucesso.",
-
-                temperatura: {
-
-                    id:
-                        temperaturaCriada.id,
-
-                    valor:
-                        temperaturaCriada.valor,
-
-                    data:
-                        temperaturaCriada.data
-
-                },
-
-                sensor: {
-
-                    id:
-                        sensor.id,
-
-                    codigo:
-                        sensor.codigo
-
-                },
-
-                caixa: {
-
-                    id:
-                        sensor.caixa_id
-
-                }
-
-            }
-        );
-
+        return responder(res, 201, {
+            sucesso: true,
+            mensagem: "Temperatura registrada com sucesso.",
+            temperatura: registro.temperatura,
+            sensor: registro.sensor,
+            caixa: registro.caixa
+        });
 
     } catch (erro) {
 

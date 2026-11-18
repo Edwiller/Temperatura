@@ -1,14 +1,22 @@
-import { CHAVE_SESSAO_PORTAL, obterSupabase } from "./supabase.js?v=desempenho-1";
+import { CHAVE_SESSAO_PORTAL, obterSupabase } from "./supabase.js?v=fluxo-sessao-1";
+import { prepararRevogacao, revogarSessoesPendentes } from "./sessaoApi.js";
 import { configurarTemaPortal } from "../components/temaPortal.js";
 
 const raiz = new URL("../../../", import.meta.url);
-const paginas = new Set(["", "index.html", "caixas.html", "cadastro.html", "dashboard.html", "administrador.html"]);
+const paginas = new Set(["", "index.html", "caixas.html", "cadastro.html", "dashboard.html", "sensores.html", "administrador.html"]);
 const chavePerfil = "temperatura.portal.perfil";
 const intervaloDaSessao = 2 * 60 * 1000;
 
-export function registrarSessao(token) {
+function guardarPerfil(token, perfil) {
+    const sessao = { token, perfil, validadoEm: Date.now() };
+    sessionStorage.setItem(chavePerfil, JSON.stringify(sessao));
+    return sessao;
+}
+
+export function registrarSessao(token, perfil) {
     sessionStorage.removeItem(chavePerfil);
     sessionStorage.setItem(CHAVE_SESSAO_PORTAL, token);
+    if (["admin", "operador"].includes(perfil)) guardarPerfil(token, perfil);
 }
 
 function limparSessao() {
@@ -33,9 +41,7 @@ async function consultarPerfilDaSessao(token) {
     if (sessionStorage.getItem(CHAVE_SESSAO_PORTAL) !== token
         || !["admin", "operador"].includes(perfil)) return null;
 
-    const sessao = { token, perfil, validadoEm: Date.now() };
-    sessionStorage.setItem(chavePerfil, JSON.stringify(sessao));
-    return sessao;
+    return guardarPerfil(token, perfil);
 }
 
 export function destinoAposLogin() {
@@ -68,6 +74,8 @@ export async function protegerPagina(secao) {
             return false;
         }
 
+        void revogarSessoesPendentes();
+        window.addEventListener("online", revogarSessoesPendentes);
         let sessao = lerPerfilDaSessao(token) ?? await consultarPerfilDaSessao(token);
         if (!sessao) {
             limparSessao();
@@ -86,6 +94,7 @@ export async function protegerPagina(secao) {
                 <nav class="portal-links" aria-label="Navegação principal">
                     <a href="./index.html" data-secao="geral">Visão geral</a>
                     <a href="./caixas.html" data-secao="caixas">Caixas</a>
+                    <a href="./sensores.html" data-secao="sensores">Sensores</a>
                     ${perfil === "admin" ? '<a href="./administrador.html" data-secao="admin">Administração</a>' : ""}
                 </nav>
                 <div class="portal-acoes">
@@ -140,9 +149,15 @@ export async function protegerPagina(secao) {
             sair.disabled = true;
             status.hidden = true;
             try {
-                const supabase = await obterSupabase();
-                const { error: erroSaida } = await supabase.rpc("portal_sair");
-                if (erroSaida) throw erroSaida;
+                try {
+                    await prepararRevogacao(token);
+                    void revogarSessoesPendentes();
+                } catch {
+                    // Em um navegador sem Web Crypto, aguarda a revogação pelo método anterior.
+                    const supabase = await obterSupabase();
+                    const { error: erroSaida } = await supabase.rpc("portal_sair");
+                    if (erroSaida) throw erroSaida;
+                }
                 encerrarInterface();
             } catch {
                 status.textContent = "Não foi possível sair. Tente novamente.";

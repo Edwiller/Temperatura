@@ -17,6 +17,10 @@ lista de caixas e ao cadastro. O painel individual mantém o endereço
    se ainda não foi instalada e depois a
    [migração de credenciais](supabase/migrations/202611170002_credenciais_do_portal.sql)
    e a [migração de administração](supabase/migrations/202611170003_administracao.sql).
+   A [migração do fluxo de sessão](supabase/migrations/202611170005_fluxo_da_sessao.sql)
+   habilita o login em uma chamada e a revogação ao sair em segundo plano.
+   Aplique também a [migração de caixas e sensores](supabase/migrations/202611180006_caixas_e_sensores.sql)
+   antes de executar a nova interface ou a API de ingestão.
 2. Abra **Solicitar acesso** na tela de login ou acesse
    [o cadastro de usuários](http://127.0.0.1:8000/cadastro-usuario.html).
    Crie a conta com nome, usuário e senha. A solicitação fica pendente.
@@ -40,6 +44,9 @@ O acesso à interface e às tabelas é compartilhado entre as contas autorizadas
 O ESP usa o endpoint existente `/api/temperatura`, com o código do sensor
 associado. O backend de desenvolvimento deve apontar para o mesmo Supabase DEV
 e usar a chave de servidor e o token de ingestão já previstos pela API.
+Quando o sensor ativo estiver sem vínculo, a leitura aparece na visão geral
+com o nome do sensor. A exclusão de uma caixa remove a caixa da lista e
+libera o sensor, preservando os registros históricos.
 
 ## Produção
 
@@ -49,7 +56,7 @@ o projeto **Temperatura** (`mrahvdxihpbzikdcmafo`). Preview e o servidor local
 usam o **Temperatura-DEV**. Uma `SUPABASE_URL` incompatível com o ambiente
 faz a função recusar a configuração.
 
-Combine a publicação com a aplicação das migrações 001 a 004 em uma única
+Em uma instalação nova, aplique as migrações 001 a 006 em uma única
 transação no projeto **Temperatura**. Execute na ordem dos arquivos e
 mantenha um único `BEGIN` e `COMMIT` ao redor do lote. A migração 004
 interpreta as datas antigas como horários do Acre e confere a contagem e os

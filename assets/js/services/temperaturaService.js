@@ -1,25 +1,30 @@
 import {
     obterSupabase
-} from "../config/supabase.js?v=desempenho-1";
+} from "../config/supabase.js?v=fluxo-sessao-1";
 
-async function lerEmPaginas(consulta, mensagemDeErro) {
+async function lerEmPaginas(criarConsulta, mensagemDeErro) {
     const leituras = [];
     const tamanhoPagina = 500;
-    consulta.order("data").order("id");
+    let ultima;
 
-    for (let offset = 0; ; offset += tamanhoPagina) {
-        const { data, error } = await consulta
-            .range(offset, offset + tamanhoPagina - 1);
+    for (;;) {
+        const consulta = criarConsulta().order("data").order("id").limit(tamanhoPagina);
+        if (ultima) {
+            consulta.gte("data", ultima.data)
+                .or(`data.gt.${ultima.data},and(data.eq.${ultima.data},id.gt.${ultima.id})`);
+        }
+        const { data, error } = await consulta;
 
         if (error) throw new Error(mensagemDeErro);
         leituras.push(...data);
         if (data.length < tamanhoPagina) return leituras;
+        ultima = data.at(-1);
     }
 }
 
 export async function buscarTemperaturasGerais(inicio, fim) {
     const supabase = await obterSupabase();
-    const consulta = supabase.from("temperaturas")
+    const consulta = () => supabase.from("temperaturas")
         .select("id,valor,data,caixa_id,sensor_id")
         .gte("data", inicio)
         .lt("data", fim);
@@ -189,7 +194,7 @@ export async function buscarTemperaturasPorPeriodo(
 
 
     const supabase = await obterSupabase();
-    const consulta = supabase.from("temperaturas")
+    const consulta = () => supabase.from("temperaturas")
         .select("id,valor,data,caixa_id,sensor_id")
         .eq("caixa_id", caixaId)
         .gte("data", inicio)

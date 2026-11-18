@@ -16,10 +16,10 @@
     <link rel="stylesheet" href="./assets/css/global.css">
     <link rel="stylesheet" href="./assets/css/portal.css?v=admin-1">
 
-    <link rel="stylesheet" href="./assets/css/dashboard.css">
+    <link rel="stylesheet" href="./assets/css/dashboard.css?v=gestao-1">
 
 
-    <script type="module" src="./assets/js/pages/dashboard.js?v=desempenho-1" defer></script>
+    <script type="module" src="./assets/js/pages/dashboard.js?v=gestao-1" defer></script>
 
 </head>
 
@@ -841,7 +841,7 @@
                  LEITURAS DE TEMPERATURA
             ================================================== -->
 
-            <section class="dashboard-secao" aria-labelledby="leiturasTitulo">
+            <section class="dashboard-secao" id="secaoLeituras" aria-labelledby="leiturasTitulo">
                 <div class="secao-titulo">
                     <h2 id="leiturasTitulo">Leituras de temperatura</h2>
                 </div>
@@ -860,6 +860,10 @@
                     </table>
                 </div>
                 <p id="leiturasResumo" class="leituras-resumo" role="status"></p>
+                <div id="leiturasPaginacao" class="leituras-paginacao" hidden>
+                    <button id="leiturasAnterior" type="button" class="portal-botao portal-botao-secundario">Anterior</button>
+                    <button id="leiturasSeguinte" type="button" class="portal-botao portal-botao-secundario">Próxima</button>
+                </div>
             </section>
 
 

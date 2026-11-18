@@ -219,6 +219,37 @@
 .portal-caixas dt { color: var(--cor-texto-secundario); font-size: 12px; }
 .portal-caixas dd { font-size: 14px; font-weight: 650; }
 .portal-caixas .portal-botao { margin-top: auto; }
+.portal-cartao-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; }
+.portal-acoes-caixa { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.portal-icone {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 19px;
+    text-decoration: none;
+    cursor: pointer;
+}
+.portal-icone-excluir { color: #b42318; }
+.portal-tema-escuro .portal-icone-excluir { color: #ffb4aa; }
+.portal-icone:hover { background: var(--cor-fundo); }
+.portal-dialogo {
+    width: min(420px, calc(100% - 32px));
+    margin: auto;
+    padding: 22px;
+    color: var(--cor-texto);
+    background: var(--cor-card, Canvas);
+    border: 1px solid var(--cor-borda);
+    border-radius: 14px;
+}
+.portal-dialogo::backdrop { background: rgb(0 0 0 / 45%); }
+.portal-dialogo form { display: grid; gap: 12px; }
+.portal-dialogo select { width: 100%; min-height: 42px; padding: 6px; font: inherit; }
 
 .portal-pendencias { list-style: none; margin: 14px 0; }
 .portal-pendencias li {

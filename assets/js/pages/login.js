@@ -1,5 +1,6 @@
-import { obterSupabase } from "../config/supabase.js?v=desempenho-1";
-import { destinoAposLogin, registrarSessao } from "../config/acesso.js?v=desempenho-1";
+import { obterConfiguracaoSupabase } from "../config/supabase.js?v=fluxo-sessao-1";
+import { destinoAposLogin, registrarSessao } from "../config/acesso.js?v=gestao-1";
+import { entrarNoPortal, revogarSessoesPendentes } from "../config/sessaoApi.js";
 
 const form = document.getElementById("formLogin");
 const botao = form.querySelector("button");
@@ -16,18 +17,14 @@ form.addEventListener("submit", async evento => {
     avisoCadastro.hidden = true;
 
     try {
-        const supabase = await obterSupabase();
-        const { data: token, error } = await supabase.rpc("portal_entrar", {
-            p_usuario: form.elements.usuario.value.trim(),
-            p_senha: form.elements.senha.value
-        });
-        if (error) throw error;
+        const sessao = await entrarNoPortal(form.elements.usuario.value.trim(), form.elements.senha.value);
+        const token = sessao?.token;
         if (typeof token !== "string" || !/^[0-9a-f]{64}$/.test(token)) {
             mensagem.textContent = "Confira seu usuário e senha. Se a conta for nova, aguarde a liberação.";
             return;
         }
 
-        registrarSessao(token);
+        registrarSessao(token, sessao.perfil);
         form.reset();
         location.replace(destinoAposLogin());
     } catch {
@@ -39,4 +36,7 @@ form.addEventListener("submit", async evento => {
 });
 
 botao.disabled = false;
-void obterSupabase().catch(() => {});
+void obterConfiguracaoSupabase().catch(() => {});
+void revogarSessoesPendentes();
+window.setTimeout(revogarSessoesPendentes, 5000);
+window.addEventListener("online", revogarSessoesPendentes);

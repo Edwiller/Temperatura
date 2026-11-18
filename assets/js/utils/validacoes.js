@@ -44,7 +44,8 @@ export function numeroValido(valor) {
 export function validarCaixa(
     caixa,
     sensorId,
-    codigoNovoSensor = ""
+    codigoNovoSensor = "",
+    { exigirSensor = true } = {}
 ) {
 
     if (textoVazio(caixa.codigo)) {
@@ -175,7 +176,7 @@ export function validarCaixa(
         };
     }
 
-    if (!codigoNovoSensor && (!Number.isInteger(sensorId) || sensorId <= 0)) {
+    if (exigirSensor && !codigoNovoSensor && (!Number.isInteger(sensorId) || sensorId <= 0)) {
         return {
             valido: false,
             mensagem:

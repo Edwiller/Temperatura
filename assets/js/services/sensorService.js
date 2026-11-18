@@ -1,6 +1,23 @@
 import {
     obterSupabase
-} from "../config/supabase.js?v=desempenho-1";
+} from "../config/supabase.js?v=fluxo-sessao-1";
+
+export async function listarNomesSensores() {
+    const supabase = await obterSupabase();
+    const { data, error } = await supabase.from("sensores").select("id,codigo,nome");
+    if (error) throw new Error("Não foi possível carregar os nomes dos sensores.");
+    return data;
+}
+
+export async function alterarVinculoSensor(sensorId, caixaId, caixaAnterior = null) {
+    const supabase = await obterSupabase();
+    const { error } = await supabase.rpc("alterar_vinculo_sensor", {
+        p_sensor: sensorId, p_caixa: caixaId, p_caixa_anterior: caixaAnterior
+    });
+    if (error?.code === "P0001" || error?.code === "42501") throw new Error(error.message);
+    if (error?.code === "23505") throw new Error("A caixa escolhida já tem um sensor.");
+    if (error) throw new Error("Não foi possível alterar o vínculo do sensor.");
+}
 
 
 /* =========================================================

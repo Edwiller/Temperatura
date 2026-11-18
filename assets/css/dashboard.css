@@ -951,6 +951,8 @@
     font-size: 12px;
 }
 
+.leituras-paginacao { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
 .leituras-tabela:not([hidden]) + .leituras-resumo {
     margin-top: 12px;
 }

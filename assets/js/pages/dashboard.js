@@ -4,18 +4,18 @@
 
 import {
     buscarCaixaPorId
-} from "../services/caixaService.js?v=desempenho-1";
+} from "../services/caixaService.js?v=gestao-1";
 
-import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
+import { protegerPagina } from "../config/acesso.js?v=gestao-1";
 
 import {
     buscarSensorPorCaixa
-} from "../services/sensorService.js?v=desempenho-1";
+} from "../services/sensorService.js?v=gestao-1";
 
 
 import {
     buscarTemperaturasPorPeriodo
-} from "../services/temperaturaService.js?v=desempenho-1";
+} from "../services/temperaturaService.js?v=gestao-1";
 
 
 import {
@@ -88,6 +88,14 @@ const dashboardConteudo =
 const leiturasTabela = document.getElementById("leiturasTabela");
 const leiturasCorpo = document.getElementById("leiturasCorpo");
 const leiturasResumo = document.getElementById("leiturasResumo");
+const secaoLeituras = document.getElementById("secaoLeituras");
+const paginacaoLeituras = document.getElementById("leiturasPaginacao");
+const leiturasAnterior = document.getElementById("leiturasAnterior");
+const leiturasSeguinte = document.getElementById("leiturasSeguinte");
+const leiturasPorPagina = 60;
+let paginaLeituras = 0;
+let dadosTabela;
+let tabelaSolicitada = false;
 
 /* =========================================================
    ELEMENTOS DO FILTRO
@@ -553,12 +561,25 @@ const formatadorDataLeitura = new Intl.DateTimeFormat("pt-BR", {
 });
 
 function mostrarLeituras(temperaturas, caixa) {
+    dadosTabela = { temperaturas, codigoCaixa: caixa.codigo || String(caixa.id) };
+    paginaLeituras = 0;
+    const total = temperaturas.length;
+    leiturasResumo.textContent = total
+        ? `${formatarNumero(total)} ${total === 1 ? "leitura" : "leituras"} no período selecionado.`
+        : "Nenhuma leitura registrada no período selecionado.";
+    if (tabelaSolicitada) renderizarPaginaDeLeituras();
+}
+
+function renderizarPaginaDeLeituras() {
+    if (!dadosTabela) return;
+    const { temperaturas, codigoCaixa } = dadosTabela;
     const linhas = document.createDocumentFragment();
-    const codigoCaixa = caixa.codigo || String(caixa.id);
+    const inicio = paginaLeituras * leiturasPorPagina;
+    const fim = Math.min(inicio + leiturasPorPagina, temperaturas.length);
 
     // O serviço retorna as leituras em ordem crescente de data.
-    for (let indice = temperaturas.length - 1; indice >= 0; indice--) {
-        const leitura = temperaturas[indice];
+    for (let indice = inicio; indice < fim; indice++) {
+        const leitura = temperaturas[temperaturas.length - 1 - indice];
         const linha = document.createElement("tr");
         const dataLeitura = new Date(leitura.data);
 
@@ -574,12 +595,28 @@ function mostrarLeituras(temperaturas, caixa) {
     }
 
     leiturasCorpo.replaceChildren(linhas);
+    leiturasTabela.scrollTop = 0;
     leiturasTabela.hidden = temperaturas.length === 0;
-    leiturasResumo.textContent = temperaturas.length === 0
-        ? "Nenhuma leitura registrada no período selecionado."
-        : temperaturas.length === 1
-            ? "1 leitura no período selecionado."
-            : `${formatarNumero(temperaturas.length)} leituras no período selecionado.`;
+    paginacaoLeituras.hidden = temperaturas.length <= leiturasPorPagina;
+    leiturasAnterior.disabled = inicio === 0;
+    leiturasSeguinte.disabled = fim === temperaturas.length;
+    if (temperaturas.length > leiturasPorPagina) {
+        leiturasResumo.textContent = `${inicio + 1} a ${fim} de ${formatarNumero(temperaturas.length)} leituras`;
+    }
+}
+
+leiturasAnterior.addEventListener("click", () => { paginaLeituras--; renderizarPaginaDeLeituras(); });
+leiturasSeguinte.addEventListener("click", () => { paginaLeituras++; renderizarPaginaDeLeituras(); });
+if (typeof IntersectionObserver === "function") {
+    const observarLeituras = new IntersectionObserver(([entrada]) => {
+        if (!entrada.isIntersecting) return;
+        tabelaSolicitada = true;
+        observarLeituras.disconnect();
+        renderizarPaginaDeLeituras();
+    }, { rootMargin: "180px" });
+    observarLeituras.observe(secaoLeituras);
+} else {
+    tabelaSolicitada = true;
 }
 
 async function atualizarGraficoDoPeriodo(temperaturas, caixa, dia, consulta) {
@@ -1378,12 +1415,24 @@ async function iniciarDashboard() {
         }
 
 
-        const [caixa, sensor, temperaturas] = await Promise.all([
-            buscarCaixaPorId(caixaId),
-            buscarSensorPorCaixa(caixaId),
-            buscarTemperaturasPorPeriodo(caixaId, inicio, fim)
+        const consulta = ++ultimaConsultaMonitoramento;
+        const contexto = Promise.all([buscarCaixaPorId(caixaId), buscarSensorPorCaixa(caixaId)])
+            .then(([caixa, sensor]) => {
+                if (caixa.excluida_em) throw new Error("Esta caixa foi excluída.");
+                caixaAtual = caixa;
+                mostrarDadosCaixa(caixa);
+                mostrarDadosSensor(sensor);
+                dashboardConteudo.dataset.caixaId = caixa.id;
+                dashboardConteudo.dataset.periodo = diaInicial ? "personalizado" : "24h";
+                if (sensor) dashboardConteudo.dataset.sensorId = sensor.id;
+                leiturasResumo.textContent = "Carregando leituras...";
+                mostrarConteudo();
+                return caixa;
+            });
+        const [caixa, temperaturas] = await Promise.all([
+            contexto, buscarTemperaturasPorPeriodo(caixaId, inicio, fim)
         ]);
-        caixaAtual = caixa;
+        if (consulta !== ultimaConsultaMonitoramento) return;
 
 
         console.log(
@@ -1414,24 +1463,6 @@ async function iniciarDashboard() {
 
 
         /* =================================================
-           5. DADOS DA CAIXA
-        ================================================= */
-
-        mostrarDadosCaixa(
-            caixa
-        );
-
-
-        /* =================================================
-           6. SENSOR
-        ================================================= */
-
-        mostrarDadosSensor(
-            sensor
-        );
-
-
-        /* =================================================
            7. CARDS
         ================================================= */
 
@@ -1442,27 +1473,7 @@ async function iniciarDashboard() {
 
         mostrarLeituras(temperaturas, caixa);
 
-        /* =================================================
-           9. INFORMAÇÕES PARA TESTES
-        ================================================= */
-
-        dashboardConteudo.dataset.caixaId =
-            caixa.id;
-
-
-        dashboardConteudo.dataset.periodo =
-            diaInicial ? "personalizado" : "24h";
-
-
-        if (sensor) {
-
-            dashboardConteudo.dataset.sensorId =
-                sensor.id;
-
-        }
-
-        mostrarConteudo();
-        await atualizarGraficoDoPeriodo(temperaturas, caixa, diaInicial, ultimaConsultaMonitoramento);
+        await atualizarGraficoDoPeriodo(temperaturas, caixa, diaInicial, consulta);
 
         console.log(
             "🎉 Dashboard carregado."

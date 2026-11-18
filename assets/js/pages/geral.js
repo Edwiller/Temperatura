@@ -1,6 +1,7 @@
-import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
-import { listarCaixas } from "../services/caixaService.js?v=desempenho-1";
-import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=desempenho-1";
+import { protegerPagina } from "../config/acesso.js?v=gestao-1";
+import { listarCaixas } from "../services/caixaService.js?v=gestao-1";
+import { listarNomesSensores } from "../services/sensorService.js?v=gestao-1";
+import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=gestao-1";
 import { coresGrafico, eventoTemaPortal } from "../components/temaPortal.js?v=grafico-1";
 import { carregarECharts } from "../components/carregarECharts.js";
 import {
@@ -26,11 +27,14 @@ let carregando = false;
 let consultaAtual;
 let grafico;
 let caixasPorId = new Map();
-let caixasProntas;
+let sensoresPorId = new Map();
+let nomesProntos;
+let cacheLeituras;
 
-function nomeCaixa(id) {
-    if (id == null) return "Sem caixa vinculada";
-    return caixasPorId.get(id) || `Caixa ${id}`;
+function nomeDaOrigem(leitura) {
+    if (leitura.caixa_id != null) return caixasPorId.get(leitura.caixa_id) || `Caixa ${leitura.caixa_id}`;
+    if (leitura.sensor_id != null) return sensoresPorId.get(leitura.sensor_id) || `Sensor ${leitura.sensor_id}`;
+    return "Sem identificação";
 }
 
 function mostrarMetricas(leituras) {
@@ -49,7 +53,7 @@ function mostrarMetricas(leituras) {
     metricas.forEach((elemento, indice) => {
         elemento.textContent = leituras.length ? `${numero.format(valores[indice])} °C` : "—";
     });
-    ultimaCaixa.textContent = ultima ? nomeCaixa(ultima.caixa_id) : "";
+    ultimaCaixa.textContent = ultima ? nomeDaOrigem(ultima) : "";
 }
 
 function mostrarGrafico(leituras, dia) {
@@ -57,10 +61,7 @@ function mostrarGrafico(leituras, dia) {
     for (const leitura of leituras) {
         const grupo = leitura.caixa_id ?? `sem-caixa-${leitura.sensor_id ?? ""}`;
         if (!porCaixa.has(grupo)) {
-            const nome = leitura.caixa_id == null && leitura.sensor_id != null
-                ? `Sensor ${leitura.sensor_id} · sem caixa`
-                : nomeCaixa(leitura.caixa_id);
-            porCaixa.set(grupo, { nome, pontos: [] });
+            porCaixa.set(grupo, { nome: nomeDaOrigem(leitura), pontos: [] });
         }
         porCaixa.get(grupo).pontos.push([leitura.instante, leitura.valor]);
     }
@@ -92,22 +93,40 @@ async function carregarPeriodo(periodo, atualizar = false) {
     try {
         const primeiroDia = inicioDoDiaNoAcre(periodo.inicio);
         const ultimoDia = inicioDoDiaNoAcre(periodo.fim);
+        const agora = Date.now();
+        // Reconsulta uma pequena sobreposição para capturar inserções que chegaram fora de ordem.
+        const anterior = atualizar && cacheLeituras?.periodo === periodo && agora - cacheLeituras.completoEm < 300000
+            ? cacheLeituras : null;
+        const ultimoInstante = anterior?.leituras.at(-1)?.instante;
+        const desde = ultimoInstante == null ? primeiroDia : Math.max(primeiroDia, Math.min(agora, ultimoInstante) - 120000);
         const [registros] = await Promise.all([
             buscarTemperaturasGerais(
-                new Date(primeiroDia).toISOString(),
+                new Date(desde).toISOString(),
                 new Date(ultimoDia + 86400000).toISOString()
             ),
-            caixasProntas
+            nomesProntos
         ]);
         if (consulta !== totalConsultas) return;
 
-        const leituras = registros.flatMap(leitura => {
+        const novas = registros.flatMap(leitura => {
             const valor = Number(leitura.valor);
             const instante = Date.parse(leitura.data);
             return leitura.valor != null && Number.isFinite(valor) && Number.isFinite(instante)
                 ? [{ ...leitura, valor, instante }]
                 : [];
         });
+        let leituras = novas;
+        if (anterior) {
+            const corte = anterior.leituras.findIndex(leitura => leitura.instante >= desde);
+            const prefixo = corte === -1 ? anterior.leituras : anterior.leituras.slice(0, corte);
+            if (!imprimir.disabled && prefixo.length + novas.length === anterior.leituras.length && novas.every((leitura, indice) => {
+                const antiga = anterior.leituras[prefixo.length + indice];
+                return antiga.id === leitura.id && antiga.data === leitura.data && antiga.valor === leitura.valor
+                    && antiga.caixa_id === leitura.caixa_id && antiga.sensor_id === leitura.sensor_id;
+            })) return;
+            leituras = prefixo.concat(novas);
+        }
+        cacheLeituras = { periodo, leituras, completoEm: anterior?.completoEm ?? agora };
         mostrarMetricas(leituras);
         const umDia = periodo.inicio === periodo.fim;
         const rotuloPeriodo = umDia
@@ -196,11 +215,11 @@ if (await protegerPagina("geral")) {
     atualizarRelogio();
     setInterval(atualizarRelogio, 1000);
 
-    caixasProntas = listarCaixas()
-        .then(caixas => {
-            caixasPorId = new Map(caixas.map(caixa => [caixa.id, caixa.codigo]));
-        })
-        .catch(erro => console.warn("Os códigos das caixas serão substituídos por seus IDs.", erro));
+    nomesProntos = Promise.allSettled([listarCaixas({ incluirExcluidas: true }), listarNomesSensores()])
+        .then(([caixas, sensores]) => {
+            caixasPorId = new Map((caixas.value ?? []).map(caixa => [caixa.id, caixa.codigo]));
+            sensoresPorId = new Map((sensores.value ?? []).map(sensor => [sensor.id, sensor.nome || sensor.codigo]));
+        });
     void carregarPeriodo(consultaAtual);
     setInterval(() => {
         const hoje = dataDasLeituras.format(new Date());

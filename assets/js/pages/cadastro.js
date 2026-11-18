@@ -1,10 +1,10 @@
-import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
-import { listarSensoresDisponiveis } from "../services/sensorService.js?v=desempenho-1";
-import { cadastrarCaixaComSensor } from "../services/caixaService.js?v=desempenho-1";
+import { protegerPagina } from "../config/acesso.js?v=gestao-1";
+import { listarSensoresDisponiveis } from "../services/sensorService.js?v=gestao-1";
+import { buscarCaixaPorId, cadastrarCaixaComSensor, editarCaixa } from "../services/caixaService.js?v=gestao-1";
 
 import {
     validarCaixa
-} from "../utils/validacoes.js?v=portal-2";
+} from "../utils/validacoes.js?v=gestao-1";
 
 
 /* =========================================================
@@ -13,6 +13,7 @@ import {
 
 const form =
     document.getElementById("formCaixa");
+const idEdicao = new URLSearchParams(location.search).get("editar");
 
 
 const sensorSelect =
@@ -118,7 +119,7 @@ function definirProcessando(
     if (processando) {
 
         btnSalvarTexto.textContent =
-            "Cadastrando...";
+            idEdicao ? "Salvando..." : "Cadastrando...";
 
 
         btnSalvarSpinner
@@ -128,7 +129,7 @@ function definirProcessando(
     } else {
 
         btnSalvarTexto.textContent =
-            "Cadastrar caixa";
+            idEdicao ? "Salvar alterações" : "Cadastrar caixa";
 
 
         btnSalvarSpinner
@@ -162,6 +163,32 @@ async function carregarSensores() {
         mostrarMensagem("Não foi possível carregar os sensores. Recarregue a página para tentar novamente.", "erro");
     } finally {
         sensorCarregando.classList.add("oculto");
+    }
+}
+
+async function carregarEdicao() {
+    document.title = "Editar caixa | Monitoramento Térmico";
+    document.querySelector(".pagina-cabecalho .etiqueta").textContent = "Caixas";
+    document.querySelector(".pagina-cabecalho h1").textContent = "Editar caixa";
+    document.querySelector(".pagina-cabecalho p").textContent = "Atualize as informações e os limites da caixa.";
+    const secaoSensor = sensorSelect.closest("section");
+    secaoSensor.hidden = true;
+    sensorSelect.disabled = true;
+    codigoNovoSensor.disabled = true;
+    document.getElementById("btnLimpar").hidden = true;
+    btnSalvarTexto.textContent = "Salvar alterações";
+
+    try {
+        if (!/^[1-9]\d*$/.test(idEdicao)) throw new Error("Caixa inválida.");
+        const caixa = await buscarCaixaPorId(idEdicao);
+        if (caixa.excluida_em) throw new Error("Esta caixa foi excluída.");
+        const campos = { codigo: "codigo", nome: "nome", volume: "volume_litros", comprimento: "comprimento_cm",
+            largura: "largura_cm", altura: "altura_cm", hemocomponentes: "quantidade_hemocomponentes",
+            gelo: "peso_gelo_kg", temperaturaMin: "temperatura_min", temperaturaMax: "temperatura_max" };
+        for (const [id, chave] of Object.entries(campos)) document.getElementById(id).value = caixa[chave] ?? "";
+        btnSalvar.disabled = false;
+    } catch (erro) {
+        mostrarMensagem(erro.message, "erro");
     }
 }
 
@@ -321,7 +348,7 @@ async function cadastrar(evento) {
     const novoSensor = sensorSelect.value === "novo";
     const sensorId = novoSensor ? null : Number(sensorSelect.value);
     const codigo = novoSensor ? codigoNovoSensor.value.trim() : "";
-    const validacao = validarCaixa(caixa, sensorId, codigo);
+    const validacao = validarCaixa(caixa, sensorId, codigo, { exigirSensor: !idEdicao });
     if (!validacao.valido) {
         mostrarMensagem(validacao.mensagem, "erro");
         return;
@@ -329,6 +356,11 @@ async function cadastrar(evento) {
 
     definirProcessando(true);
     try {
+        if (idEdicao) {
+            await editarCaixa(idEdicao, caixa);
+            location.assign("./caixas.html?atualizada=1");
+            return;
+        }
         const caixaCriada = await cadastrarCaixaComSensor(caixa, sensorId, codigo);
         form.dataset.caixaId = caixaCriada.id;
         abrirCaixa.href = `./dashboard.html?caixa=${caixaCriada.id}`;
@@ -369,4 +401,7 @@ form.addEventListener(
 
 
 
-if (await protegerPagina("caixas")) await carregarSensores();
+if (await protegerPagina("caixas")) {
+    if (idEdicao !== null) await carregarEdicao();
+    else await carregarSensores();
+}

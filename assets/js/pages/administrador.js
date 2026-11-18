@@ -1,5 +1,5 @@
-import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
-import { obterSupabase } from "../config/supabase.js?v=desempenho-1";
+import { protegerPagina } from "../config/acesso.js?v=gestao-1";
+import { obterSupabase } from "../config/supabase.js?v=fluxo-sessao-1";
 
 const lista = document.getElementById("listaPendencias");
 const estado = document.getElementById("estadoPendencias");

@@ -22,7 +22,7 @@ const SUPABASE_SECRET_KEY =
 /*
  * Segurança adicional:
  *
- * Os testes de 409 criam sensores temporários.
+ * Os testes com sensores temporários exigem autorização para escritas no banco.
  * Só permitimos isso quando explicitamente
  * autorizado no ambiente local.
  */
@@ -1002,7 +1002,7 @@ async function testarSensorInativo() {
 
 /* =========================================================
    TESTE 14
-   SENSOR SEM CAIXA → 409
+   SENSOR SEM CAIXA → 201
 ========================================================= */
 
 async function testarSensorSemCaixa() {
@@ -1011,20 +1011,12 @@ async function testarSensorSemCaixa() {
         `TEST-SEM-CAIXA-${Date.now()}`;
 
 
-    let criado =
-        false;
+    let sensorTemporario;
 
 
     try {
 
-        await criarSensorTemporario(
-            codigo,
-            true
-        );
-
-
-        criado =
-            true;
+        sensorTemporario = await criarSensorTemporario(codigo, true);
 
 
         const resposta =
@@ -1044,15 +1036,14 @@ async function testarSensorSemCaixa() {
 
 
         verificar(
-            resposta.status === 409,
-            `Esperado 409, recebido ${resposta.status}.`
+            resposta.status === 201,
+            `Esperado 201, recebido ${resposta.status}.`
         );
 
 
         verificar(
-            resposta.dados?.erro ===
-            "O sensor não está associado a nenhuma caixa.",
-            "Mensagem de sensor sem caixa não foi retornada."
+            resposta.dados?.caixa === null && resposta.dados?.sensor?.codigo === codigo,
+            "A leitura não foi gravada como leitura avulsa do sensor."
         );
 
 
@@ -1063,10 +1054,11 @@ async function testarSensorSemCaixa() {
 
     } finally {
 
-        if (criado) {
+        if (sensorTemporario) {
 
             try {
 
+                await chamarSupabase(`temperaturas?sensor_id=eq.${sensorTemporario.id}`, { method: "DELETE" });
                 await apagarSensorTemporario(
                     codigo
                 );
@@ -1236,7 +1228,7 @@ async function executarTestes() {
 
 
             await executarTeste(
-                "TESTE 14 - Sensor sem caixa → 409",
+                "TESTE 14 - Sensor sem caixa → 201",
                 testarSensorSemCaixa
             );
 
@@ -1250,7 +1242,7 @@ async function executarTestes() {
 
 
             ignorarTeste(
-                "TESTE 14 - Sensor sem caixa → 409",
+                "TESTE 14 - Sensor sem caixa → 201",
                 "ALLOW_INTEGRATION_DB_MUTATION não está true."
             );
 

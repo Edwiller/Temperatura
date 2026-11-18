@@ -1,6 +1,6 @@
 import {
     obterSupabase
-} from "../config/supabase.js?v=desempenho-1";
+} from "../config/supabase.js?v=fluxo-sessao-1";
 
 async function buscarPaginas(consulta) {
     const registros = [];
@@ -14,15 +14,16 @@ async function buscarPaginas(consulta) {
     }
 }
 
-export async function listarCaixas({ incluirSensores = false } = {}) {
+export async function listarCaixas({ incluirSensores = false, incluirExcluidas = false } = {}) {
     const supabase = await obterSupabase();
     const consultaCaixas = supabase.from("caixas")
         .select("id,codigo,nome,temperatura_min,temperatura_max")
         .order("codigo").order("id");
+    if (!incluirExcluidas) consultaCaixas.is("excluida_em", null);
     if (!incluirSensores) return buscarPaginas(consultaCaixas);
 
     const consultaSensores = supabase.from("sensores")
-        .select("id,codigo,ativo,caixa_id")
+        .select("id,codigo,nome,ativo,caixa_id")
         .not("caixa_id", "is", null)
         .order("id");
     const [caixas, sensores] = await Promise.all([buscarPaginas(consultaCaixas), buscarPaginas(consultaSensores)]);
@@ -31,6 +32,22 @@ export async function listarCaixas({ incluirSensores = false } = {}) {
         caixasPorId.get(sensor.caixa_id)?.sensores.push(sensor);
     }
     return [...caixasPorId.values()];
+}
+
+async function alterarCaixa(funcao, parametros) {
+    const supabase = await obterSupabase();
+    const { error } = await supabase.rpc(funcao, parametros);
+    if (error?.code === "23505") throw new Error("O código da caixa já está cadastrado.");
+    if (error?.code === "P0001" || error?.code === "42501") throw new Error(error.message);
+    if (error) throw new Error("Não foi possível salvar a alteração da caixa.");
+}
+
+export function editarCaixa(id, caixa) {
+    return alterarCaixa("editar_caixa", { p_caixa: id, dados_caixa: caixa });
+}
+
+export function excluirCaixa(id) {
+    return alterarCaixa("excluir_caixa", { p_caixa: id });
 }
 
 export async function cadastrarCaixaComSensor(caixa, sensorId, codigoNovoSensor) {

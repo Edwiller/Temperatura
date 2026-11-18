@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sensores | Monitoramento Térmico</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./assets/css/global.css">
+    <link rel="stylesheet" href="./assets/css/portal.css?v=gestao-1">
+    <script type="module" src="./assets/js/pages/sensores.js?v=gestao-1"></script>
+</head>
+<body>
+    <header data-portal-header hidden></header>
+    <p class="portal-acesso" data-portal-status role="status" hidden></p>
+    <main class="portal-pagina" data-portal-content hidden>
+        <div class="portal-titulo">
+            <div>
+                <h1>Sensores disponíveis</h1>
+                <p>Sensores ativos e sem caixa vinculada.</p>
+            </div>
+        </div>
+        <p id="estadoSensores" class="portal-estado" role="status">Carregando sensores...</p>
+        <ul id="listaSensores" class="portal-caixas"></ul>
+        <dialog class="portal-dialogo" id="vincularSensor" aria-labelledby="tituloVinculo">
+            <form id="formVinculo" class="portal-lista-controles">
+                <h2 id="tituloVinculo">Vincular sensor</h2>
+                <label for="caixaVinculo">Caixa disponível</label>
+                <select id="caixaVinculo" required></select>
+                <p id="erroVinculo" role="status" hidden></p>
+                <div class="portal-acoes-caixa">
+                    <button type="button" class="portal-botao portal-botao-secundario" id="cancelarVinculo">Cancelar</button>
+                    <button type="submit" class="portal-botao" id="confirmarVinculo">Vincular</button>
+                </div>
+            </form>
+        </dialog>
+    </main>
+</body>
+</html>

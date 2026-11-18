@@ -15,15 +15,24 @@ async function carregarConfiguracao() {
     } catch {
         // A interface exibe o erro de configuração quando a API está indisponível.
     }
-    return null;
+    throw new Error("A configuração do portal está indisponível.");
+}
+
+let configuracao;
+
+export function obterConfiguracaoSupabase() {
+    configuracao ??= carregarConfiguracao().catch(erro => {
+        configuracao = undefined;
+        throw erro;
+    });
+    return configuracao;
 }
 
 async function criarCliente() {
     const [config, { createClient }] = await Promise.all([
-        carregarConfiguracao(),
+        obterConfiguracaoSupabase(),
         import("https://esm.sh/@supabase/supabase-js@2")
     ]);
-    if (!config) throw new Error("A configuração do portal está indisponível.");
 
     return createClient(config.url, config.chave, {
         auth: {
