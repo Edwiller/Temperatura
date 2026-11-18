@@ -1,5 +1,3 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 export const CHAVE_SESSAO_PORTAL = "temperatura.portal.sessao";
 
 const configuracaoLocal = {
@@ -20,22 +18,39 @@ async function carregarConfiguracao() {
     return null;
 }
 
-const config = await carregarConfiguracao();
-export const supabase = config && createClient(config.url, config.chave, {
-    auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-    },
-    global: {
-        fetch: (input, init) => {
-            const token = sessionStorage.getItem(CHAVE_SESSAO_PORTAL);
-            const url = input instanceof Request ? input.url : String(input);
-            if (!token || !url.startsWith(`${config.url}/rest/v1/`)) return fetch(input, init);
+async function criarCliente() {
+    const [config, { createClient }] = await Promise.all([
+        carregarConfiguracao(),
+        import("https://esm.sh/@supabase/supabase-js@2")
+    ]);
+    if (!config) throw new Error("A configuração do portal está indisponível.");
 
-            const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
-            headers.set("x-portal-session", token);
-            return fetch(input, { ...init, headers });
+    return createClient(config.url, config.chave, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+        },
+        global: {
+            fetch: (input, init) => {
+                const token = sessionStorage.getItem(CHAVE_SESSAO_PORTAL);
+                const url = input instanceof Request ? input.url : String(input);
+                if (!token || !url.startsWith(`${config.url}/rest/v1/`)) return fetch(input, init);
+
+                const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
+                headers.set("x-portal-session", token);
+                return fetch(input, { ...init, headers });
+            }
         }
-    }
-});
+    });
+}
+
+let cliente;
+
+export function obterSupabase() {
+    cliente ??= criarCliente().catch(erro => {
+        cliente = undefined;
+        throw erro;
+    });
+    return cliente;
+}

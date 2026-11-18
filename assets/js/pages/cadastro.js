@@ -1,6 +1,6 @@
-import { protegerPagina } from "../config/acesso.js?v=sessao-1";
-import { listarSensoresDisponiveis } from "../services/sensorService.js?v=sessao-1";
-import { cadastrarCaixaComSensor } from "../services/caixaService.js?v=sessao-1";
+import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
+import { listarSensoresDisponiveis } from "../services/sensorService.js?v=desempenho-1";
+import { cadastrarCaixaComSensor } from "../services/caixaService.js?v=desempenho-1";
 
 import {
     validarCaixa

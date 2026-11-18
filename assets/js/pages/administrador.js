@@ -1,5 +1,5 @@
-import { protegerPagina } from "../config/acesso.js?v=sessao-1";
-import { supabase } from "../config/supabase.js?v=sessao-1";
+import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
+import { obterSupabase } from "../config/supabase.js?v=desempenho-1";
 
 const lista = document.getElementById("listaPendencias");
 const estado = document.getElementById("estadoPendencias");
@@ -23,6 +23,7 @@ function criarLinha(solicitacao) {
         botao.disabled = true;
         estado.textContent = "";
         try {
+            const supabase = await obterSupabase();
             const { data: aprovado, error } = await supabase.rpc("portal_aprovar_cadastro", {
                 p_usuario_id: solicitacao.usuario_id
             });
@@ -48,6 +49,7 @@ async function carregarPendencias(acrescentar = false) {
     atualizar.disabled = true;
     mais.disabled = true;
     try {
+        const supabase = await obterSupabase();
         const { data, error } = await supabase.rpc("portal_listar_cadastros_pendentes", {
             p_limite: tamanhoPagina + 1,
             p_inicio: acrescentar ? lista.children.length : 0

@@ -1,4 +1,4 @@
-import { CHAVE_SESSAO_PORTAL, supabase } from "./supabase.js?v=sessao-1";
+import { CHAVE_SESSAO_PORTAL, obterSupabase } from "./supabase.js?v=desempenho-1";
 import { configurarTemaPortal } from "../components/temaPortal.js";
 
 const raiz = new URL("../../../", import.meta.url);
@@ -27,6 +27,7 @@ function lerPerfilDaSessao(token) {
 }
 
 async function consultarPerfilDaSessao(token) {
+    const supabase = await obterSupabase();
     const { data: perfil, error } = await supabase.rpc("portal_perfil_sessao");
     if (error) throw error;
     if (sessionStorage.getItem(CHAVE_SESSAO_PORTAL) !== token
@@ -61,7 +62,6 @@ export async function protegerPagina(secao) {
     const status = document.querySelector("[data-portal-status]");
 
     try {
-        if (!supabase) throw new Error("Configuração do portal indisponível.");
         const token = sessionStorage.getItem(CHAVE_SESSAO_PORTAL);
         if (!token) {
             abrirLogin();
@@ -140,6 +140,7 @@ export async function protegerPagina(secao) {
             sair.disabled = true;
             status.hidden = true;
             try {
+                const supabase = await obterSupabase();
                 const { error: erroSaida } = await supabase.rpc("portal_sair");
                 if (erroSaida) throw erroSaida;
                 encerrarInterface();

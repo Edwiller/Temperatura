@@ -4,18 +4,18 @@
 
 import {
     buscarCaixaPorId
-} from "../services/caixaService.js?v=sessao-1";
+} from "../services/caixaService.js?v=desempenho-1";
 
-import { protegerPagina } from "../config/acesso.js?v=sessao-1";
+import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
 
 import {
     buscarSensorPorCaixa
-} from "../services/sensorService.js?v=sessao-1";
+} from "../services/sensorService.js?v=desempenho-1";
 
 
 import {
     buscarTemperaturasPorPeriodo
-} from "../services/temperaturaService.js?v=sessao-1";
+} from "../services/temperaturaService.js?v=desempenho-1";
 
 
 import {
@@ -37,8 +37,10 @@ import {
 
 
 import {
+    mostrarErroDoGraficoTemperatura,
     mostrarGraficoTemperatura
-} from "../components/graficoTemperatura.js?v=cursor-leituras-1";
+} from "../components/graficoTemperatura.js?v=desempenho-1";
+import { carregarECharts } from "../components/carregarECharts.js";
 
 import {
     dataDasLeituras, diaDasLeiturasNaUrl, fusoDasLeituras, inicioDoDiaNoAcre
@@ -580,6 +582,20 @@ function mostrarLeituras(temperaturas, caixa) {
             : `${formatarNumero(temperaturas.length)} leituras no período selecionado.`;
 }
 
+async function atualizarGraficoDoPeriodo(temperaturas, caixa, dia, consulta) {
+    try {
+        if (temperaturas.length) await carregarECharts();
+        if (consulta !== ultimaConsultaMonitoramento) return;
+
+        mostrarGraficoTemperatura(temperaturas, caixa.temperatura_min, caixa.temperatura_max, dia);
+    } catch (erro) {
+        if (consulta === ultimaConsultaMonitoramento) {
+            console.error("[DASHBOARD] Erro no gráfico:", erro);
+            mostrarErroDoGraficoTemperatura("Não foi possível exibir o gráfico.");
+        }
+    }
+}
+
 async function atualizarMonitoramento(
     inicio,
     fim,
@@ -658,13 +674,6 @@ async function atualizarMonitoramento(
         );
 
 
-        mostrarGraficoTemperatura(
-            temperaturas,
-            caixaAtual.temperatura_min,
-            caixaAtual.temperatura_max,
-            dia
-        );
-
         mostrarLeituras(temperaturas, caixaAtual);
 
         if (periodo) {
@@ -674,7 +683,7 @@ async function atualizarMonitoramento(
 
         }
 
-
+        await atualizarGraficoDoPeriodo(temperaturas, caixaAtual, dia, consulta);
         console.log(
             "✅ Cards, gráfico e leituras atualizados."
         );
@@ -1273,7 +1282,7 @@ btnComparar.addEventListener(
                 comparativo
             );
 
-
+            await carregarECharts();
             mostrarGraficoComparativo(
                 comparativo
             );
@@ -1353,43 +1362,7 @@ async function iniciarDashboard() {
     try {
 
         /* =================================================
-           1. BUSCAR CAIXA
-        ================================================= */
-
-        const caixa =
-            await buscarCaixaPorId(
-                caixaId
-            );
-
-
-        caixaAtual =
-            caixa;
-
-
-        console.log(
-            "✅ Caixa:",
-            caixa
-        );
-
-
-        /* =================================================
-           2. BUSCAR SENSOR
-        ================================================= */
-
-        const sensor =
-            await buscarSensorPorCaixa(
-                caixaId
-            );
-
-
-        console.log(
-            "✅ Sensor:",
-            sensor
-        );
-
-
-        /* =================================================
-           3. PERÍODO INICIAL
+           PERÍODO INICIAL
         ================================================= */
 
         const diaInicial = diaDasLeiturasNaUrl();
@@ -1405,12 +1378,12 @@ async function iniciarDashboard() {
         }
 
 
-        const temperaturas =
-            await buscarTemperaturasPorPeriodo(
-                caixaId,
-                inicio,
-                fim
-            );
+        const [caixa, sensor, temperaturas] = await Promise.all([
+            buscarCaixaPorId(caixaId),
+            buscarSensorPorCaixa(caixaId),
+            buscarTemperaturasPorPeriodo(caixaId, inicio, fim)
+        ]);
+        caixaAtual = caixa;
 
 
         console.log(
@@ -1467,19 +1440,6 @@ async function iniciarDashboard() {
         );
 
 
-        /* =================================================
-           8. GRÁFICO
-        ================================================= */
-
-        mostrarConteudo();
-
-        mostrarGraficoTemperatura(
-            temperaturas,
-            caixa.temperatura_min,
-            caixa.temperatura_max,
-            diaInicial
-        );
-
         mostrarLeituras(temperaturas, caixa);
 
         /* =================================================
@@ -1501,6 +1461,8 @@ async function iniciarDashboard() {
 
         }
 
+        mostrarConteudo();
+        await atualizarGraficoDoPeriodo(temperaturas, caixa, diaInicial, ultimaConsultaMonitoramento);
 
         console.log(
             "🎉 Dashboard carregado."

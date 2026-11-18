@@ -1,5 +1,5 @@
-import { supabase } from "../config/supabase.js?v=sessao-1";
-import { destinoAposLogin, registrarSessao } from "../config/acesso.js?v=sessao-1";
+import { obterSupabase } from "../config/supabase.js?v=desempenho-1";
+import { destinoAposLogin, registrarSessao } from "../config/acesso.js?v=desempenho-1";
 
 const form = document.getElementById("formLogin");
 const botao = form.querySelector("button");
@@ -16,6 +16,7 @@ form.addEventListener("submit", async evento => {
     avisoCadastro.hidden = true;
 
     try {
+        const supabase = await obterSupabase();
         const { data: token, error } = await supabase.rpc("portal_entrar", {
             p_usuario: form.elements.usuario.value.trim(),
             p_senha: form.elements.senha.value
@@ -37,5 +38,5 @@ form.addEventListener("submit", async evento => {
     }
 });
 
-botao.disabled = !supabase;
-if (!supabase) mensagem.textContent = "A configuração do portal está indisponível. Tente novamente mais tarde.";
+botao.disabled = false;
+void obterSupabase().catch(() => {});

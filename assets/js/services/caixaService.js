@@ -1,6 +1,6 @@
 import {
-    supabase
-} from "../config/supabase.js?v=sessao-1";
+    obterSupabase
+} from "../config/supabase.js?v=desempenho-1";
 
 async function buscarPaginas(consulta) {
     const registros = [];
@@ -15,6 +15,7 @@ async function buscarPaginas(consulta) {
 }
 
 export async function listarCaixas({ incluirSensores = false } = {}) {
+    const supabase = await obterSupabase();
     const consultaCaixas = supabase.from("caixas")
         .select("id,codigo,nome,temperatura_min,temperatura_max")
         .order("codigo").order("id");
@@ -33,6 +34,7 @@ export async function listarCaixas({ incluirSensores = false } = {}) {
 }
 
 export async function cadastrarCaixaComSensor(caixa, sensorId, codigoNovoSensor) {
+    const supabase = await obterSupabase();
     const { data, error } = await supabase.rpc("cadastrar_caixa_com_sensor", {
         dados_caixa: caixa,
         sensor_existente: sensorId || null,
@@ -60,6 +62,7 @@ export async function cadastrarCaixa(
     caixa
 ) {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -139,6 +142,7 @@ export async function buscarCaixaPorId(
     caixaId
 ) {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -178,6 +182,7 @@ export async function buscarCaixaPorCodigo(
     codigo
 ) {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error

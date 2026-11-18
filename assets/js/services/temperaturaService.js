@@ -1,6 +1,6 @@
 import {
-    supabase
-} from "../config/supabase.js?v=sessao-1";
+    obterSupabase
+} from "../config/supabase.js?v=desempenho-1";
 
 async function lerEmPaginas(consulta, mensagemDeErro) {
     const leituras = [];
@@ -18,6 +18,7 @@ async function lerEmPaginas(consulta, mensagemDeErro) {
 }
 
 export async function buscarTemperaturasGerais(inicio, fim) {
+    const supabase = await obterSupabase();
     const consulta = supabase.from("temperaturas")
         .select("id,valor,data,caixa_id,sensor_id")
         .gte("data", inicio)
@@ -46,6 +47,7 @@ export async function buscarTemperaturasDaCaixa(
     }
 
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -109,6 +111,7 @@ export async function buscarUltimaTemperatura(
     }
 
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -185,6 +188,7 @@ export async function buscarTemperaturasPorPeriodo(
     }
 
 
+    const supabase = await obterSupabase();
     const consulta = supabase.from("temperaturas")
         .select("id,valor,data,caixa_id,sensor_id")
         .eq("caixa_id", caixaId)

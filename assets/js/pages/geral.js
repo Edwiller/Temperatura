@@ -1,7 +1,8 @@
-import { protegerPagina } from "../config/acesso.js?v=sessao-1";
-import { listarCaixas } from "../services/caixaService.js?v=sessao-1";
-import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=sessao-1";
+import { protegerPagina } from "../config/acesso.js?v=desempenho-1";
+import { listarCaixas } from "../services/caixaService.js?v=desempenho-1";
+import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=desempenho-1";
 import { coresGrafico, eventoTemaPortal } from "../components/temaPortal.js?v=grafico-1";
+import { carregarECharts } from "../components/carregarECharts.js";
 import {
     dataDasLeituras, diaDasLeiturasNaUrl, fusoDasLeituras, inicioDoDiaNoAcre,
     limitesDoGraficoDiario, opcoesGraficoLeituras, serieDeLeituras
@@ -25,6 +26,7 @@ let carregando = false;
 let consultaAtual;
 let grafico;
 let caixasPorId = new Map();
+let caixasProntas;
 
 function nomeCaixa(id) {
     if (id == null) return "Sem caixa vinculada";
@@ -90,10 +92,13 @@ async function carregarPeriodo(periodo, atualizar = false) {
     try {
         const primeiroDia = inicioDoDiaNoAcre(periodo.inicio);
         const ultimoDia = inicioDoDiaNoAcre(periodo.fim);
-        const registros = await buscarTemperaturasGerais(
-            new Date(primeiroDia).toISOString(),
-            new Date(ultimoDia + 86400000).toISOString()
-        );
+        const [registros] = await Promise.all([
+            buscarTemperaturasGerais(
+                new Date(primeiroDia).toISOString(),
+                new Date(ultimoDia + 86400000).toISOString()
+            ),
+            caixasProntas
+        ]);
         if (consulta !== totalConsultas) return;
 
         const leituras = registros.flatMap(leitura => {
@@ -120,10 +125,13 @@ async function carregarPeriodo(periodo, atualizar = false) {
             return;
         }
 
-        if (!window.echarts) {
-            mensagem.textContent = "Não foi possível carregar a biblioteca do gráfico. Recarregue a página.";
+        try {
+            await carregarECharts();
+        } catch (erro) {
+            if (consulta === totalConsultas) mensagem.textContent = erro.message;
             return;
         }
+        if (consulta !== totalConsultas) return;
 
         mostrarGrafico(leituras, umDia ? periodo.inicio : null);
         imprimir.disabled = false;
@@ -188,14 +196,12 @@ if (await protegerPagina("geral")) {
     atualizarRelogio();
     setInterval(atualizarRelogio, 1000);
 
-    try {
-        const caixas = await listarCaixas();
-        caixasPorId = new Map(caixas.map(caixa => [caixa.id, caixa.codigo]));
-    } catch (erro) {
-        console.warn("Os códigos das caixas serão substituídos por seus IDs.", erro);
-    }
-
-    if (!carregando) carregarPeriodo(consultaAtual);
+    caixasProntas = listarCaixas()
+        .then(caixas => {
+            caixasPorId = new Map(caixas.map(caixa => [caixa.id, caixa.codigo]));
+        })
+        .catch(erro => console.warn("Os códigos das caixas serão substituídos por seus IDs.", erro));
+    void carregarPeriodo(consultaAtual);
     setInterval(() => {
         const hoje = dataDasLeituras.format(new Date());
         if (!carregando && !document.hidden && consultaAtual.fim === hoje) carregarPeriodo(consultaAtual, true);

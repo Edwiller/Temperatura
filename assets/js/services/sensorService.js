@@ -1,6 +1,6 @@
 import {
-    supabase
-} from "../config/supabase.js?v=sessao-1";
+    obterSupabase
+} from "../config/supabase.js?v=desempenho-1";
 
 
 /* =========================================================
@@ -9,6 +9,7 @@ import {
 
 export async function listarSensoresDisponiveis() {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -63,6 +64,7 @@ export async function buscarSensorPorCodigo(
     codigo
 ) {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -109,6 +111,7 @@ export async function associarSensorCaixa(
     caixaId
 ) {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -157,6 +160,7 @@ export async function liberarSensor(
     sensorId
 ) {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error
@@ -203,6 +207,7 @@ export async function buscarSensorPorCaixa(
     caixaId
 ) {
 
+    const supabase = await obterSupabase();
     const {
         data,
         error

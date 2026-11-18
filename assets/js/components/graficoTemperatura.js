@@ -3,16 +3,21 @@ import { dataDasLeituras, limitesDoGraficoDiario, opcoesGraficoLeituras, serieDe
 
 let grafico = null;
 
-function mostrarSemDados(container) {
+function mostrarSemDados(container, texto = "Nenhuma temperatura registrada para esta caixa.") {
     grafico?.dispose();
     grafico = null;
 
     const mensagem = document.createElement("div");
     mensagem.className = "grafico-sem-dados";
-    mensagem.textContent = "Nenhuma temperatura registrada para esta caixa.";
+    mensagem.textContent = texto;
     container.replaceChildren(mensagem);
     container.dataset.renderizado = "false";
     container.dataset.quantidadePontos = "0";
+}
+
+export function mostrarErroDoGraficoTemperatura(texto) {
+    const container = document.getElementById("graficoTemperatura");
+    if (container) mostrarSemDados(container, texto);
 }
 
 function serieLimite(nome, pontos, limite, cor) {
