@@ -16,15 +16,15 @@
     <link rel="stylesheet" href="./assets/css/global.css">
     <link rel="stylesheet" href="./assets/css/portal.css?v=admin-1">
 
-    <link rel="stylesheet" href="./assets/css/dashboard.css?v=gestao-1">
+    <link rel="stylesheet" href="./assets/css/dashboard.css?v=relatorio-1">
 
 
-    <script type="module" src="./assets/js/pages/dashboard.js?v=gestao-1" defer></script>
+    <script type="module" src="./assets/js/pages/dashboard.js?v=relatorio-1" defer></script>
 
 </head>
 
 
-<body>
+<body class="relatorio-caixa">
 
 
 
@@ -106,7 +106,8 @@
 
                     <span class="etiqueta">
 
-                        Caixa monitorada
+                        <span class="ocultar-na-impressao">Caixa monitorada</span>
+                        <span class="somente-impressao">Relatório da caixa</span>
 
                     </span>
 
@@ -149,7 +150,9 @@
 
                 <!-- SENSOR -->
 
-                <div id="sensorStatus" class="sensor-status">
+                <div class="dashboard-acoes">
+                    <button id="imprimirCaixa" class="portal-botao portal-botao-secundario ocultar-na-impressao" type="button" disabled>Imprimir</button>
+                    <div id="sensorStatus" class="sensor-status">
 
 
                     <span class="sensor-status-ponto"></span>
@@ -171,6 +174,7 @@
                     </div>
 
 
+                    </div>
                 </div>
 
 
@@ -492,7 +496,8 @@
                 </div>
 
 
-                <div class="filtro-periodo">
+                <p id="periodoRelatorio" class="somente-impressao"></p>
+                <div class="filtro-periodo ocultar-na-impressao">
 
 
                     <div class="filtro-campo">
@@ -571,7 +576,7 @@
                 </div>
 
 
-                <p id="filtroMensagem" class="filtro-mensagem oculto">
+                <p id="filtroMensagem" class="filtro-mensagem oculto ocultar-na-impressao">
                 </p>
 
 
@@ -830,6 +835,7 @@
                 </div>
 
 
+                <img id="graficoRelatorio" class="somente-impressao grafico-relatorio" alt="Gráfico do histórico de temperatura" hidden>
                 <div id="graficoTemperatura" class="grafico-temperatura">
                 </div>
 
@@ -841,7 +847,7 @@
                  LEITURAS DE TEMPERATURA
             ================================================== -->
 
-            <section class="dashboard-secao" id="secaoLeituras" aria-labelledby="leiturasTitulo">
+            <section class="dashboard-secao ocultar-na-impressao" id="secaoLeituras" aria-labelledby="leiturasTitulo">
                 <div class="secao-titulo">
                     <h2 id="leiturasTitulo">Leituras de temperatura</h2>
                 </div>
@@ -871,7 +877,7 @@
                  COMPARATIVO
             ================================================== -->
 
-            <section class="dashboard-secao">
+            <section class="dashboard-secao ocultar-na-impressao">
 
 
                 <div class="secao-titulo">

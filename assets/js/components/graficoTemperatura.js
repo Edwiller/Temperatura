@@ -20,6 +20,24 @@ export function mostrarErroDoGraficoTemperatura(texto) {
     if (container) mostrarSemDados(container, texto);
 }
 
+export function capturarGraficoParaImpressao() {
+    if (!grafico) return null;
+    const opcoes = grafico.getOption();
+    const impressao = window.echarts.init(document.createElement("div"), null, { width: 900, height: 345 });
+    try {
+        impressao.setOption({
+            ...opcoes,
+            backgroundColor: "#fff",
+            animation: false,
+            dataZoom: opcoes.dataZoom?.map(zoom => ({ ...zoom, start: 0, end: 100, show: false }))
+        });
+        impressao.setOption(coresGrafico(false));
+        return impressao.getDataURL({ type: "png", pixelRatio: 2, backgroundColor: "#fff" });
+    } finally {
+        impressao.dispose();
+    }
+}
+
 function serieLimite(nome, pontos, limite, cor) {
     return {
         name: nome,

@@ -37,9 +37,10 @@ import {
 
 
 import {
+    capturarGraficoParaImpressao,
     mostrarErroDoGraficoTemperatura,
     mostrarGraficoTemperatura
-} from "../components/graficoTemperatura.js?v=desempenho-1";
+} from "../components/graficoTemperatura.js?v=relatorio-1";
 import { carregarECharts } from "../components/carregarECharts.js";
 
 import {
@@ -88,6 +89,9 @@ const dashboardConteudo =
 const leiturasTabela = document.getElementById("leiturasTabela");
 const leiturasCorpo = document.getElementById("leiturasCorpo");
 const leiturasResumo = document.getElementById("leiturasResumo");
+const imprimirCaixa = document.getElementById("imprimirCaixa");
+const periodoRelatorio = document.getElementById("periodoRelatorio");
+const graficoRelatorio = document.getElementById("graficoRelatorio");
 const secaoLeituras = document.getElementById("secaoLeituras");
 const paginacaoLeituras = document.getElementById("leiturasPaginacao");
 const leiturasAnterior = document.getElementById("leiturasAnterior");
@@ -560,6 +564,45 @@ const formatadorDataLeitura = new Intl.DateTimeFormat("pt-BR", {
     timeStyle: "medium"
 });
 
+function atualizarPeriodoRelatorio(inicio, fim) {
+    periodoRelatorio.textContent = `${formatadorDataLeitura.format(new Date(inicio))} a ${formatadorDataLeitura.format(new Date(fim))} · Horário do Acre`;
+    imprimirCaixa.disabled = false;
+}
+
+function prepararGraficoRelatorio() {
+    if (!periodoRelatorio.textContent || graficoRelatorio.hasAttribute("src")) return;
+    try {
+        const imagem = capturarGraficoParaImpressao();
+        if (!imagem) return;
+        graficoRelatorio.src = imagem;
+        graficoRelatorio.hidden = false;
+    } catch (erro) {
+        console.warn("Não foi possível gerar a imagem do gráfico para impressão.", erro);
+    }
+}
+
+function limparGraficoRelatorio() {
+    graficoRelatorio.hidden = true;
+    graficoRelatorio.removeAttribute("src");
+}
+
+imprimirCaixa.addEventListener("click", async () => {
+    const consulta = ultimaConsultaMonitoramento;
+    imprimirCaixa.disabled = true;
+    try {
+        prepararGraficoRelatorio();
+        if (!graficoRelatorio.hidden) {
+            try { await graficoRelatorio.decode(); }
+            catch { limparGraficoRelatorio(); }
+        }
+        if (consulta === ultimaConsultaMonitoramento) window.print();
+    } finally {
+        if (consulta === ultimaConsultaMonitoramento) imprimirCaixa.disabled = false;
+    }
+});
+window.addEventListener("beforeprint", prepararGraficoRelatorio);
+window.addEventListener("afterprint", limparGraficoRelatorio);
+
 function mostrarLeituras(temperaturas, caixa) {
     dadosTabela = { temperaturas, codigoCaixa: caixa.codigo || String(caixa.id) };
     paginaLeituras = 0;
@@ -652,6 +695,8 @@ async function atualizarMonitoramento(
 
 
     const consulta = ++ultimaConsultaMonitoramento;
+    imprimirCaixa.disabled = true;
+    limparGraficoRelatorio();
 
     console.group(
         "ATUALIZAR MONITORAMENTO"
@@ -721,6 +766,7 @@ async function atualizarMonitoramento(
         }
 
         await atualizarGraficoDoPeriodo(temperaturas, caixaAtual, dia, consulta);
+        if (consulta === ultimaConsultaMonitoramento) atualizarPeriodoRelatorio(inicio, fim);
         console.log(
             "✅ Cards, gráfico e leituras atualizados."
         );
@@ -741,6 +787,7 @@ async function atualizarMonitoramento(
         mostrarMensagemFiltro(
             "Não foi possível atualizar o período."
         );
+        imprimirCaixa.disabled = !periodoRelatorio.textContent;
 
 
     } finally {
@@ -1474,6 +1521,7 @@ async function iniciarDashboard() {
         mostrarLeituras(temperaturas, caixa);
 
         await atualizarGraficoDoPeriodo(temperaturas, caixa, diaInicial, consulta);
+        if (consulta === ultimaConsultaMonitoramento) atualizarPeriodoRelatorio(inicio, fim);
 
         console.log(
             "🎉 Dashboard carregado."

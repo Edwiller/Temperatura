@@ -953,6 +953,73 @@
 
 .leituras-paginacao { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
+.dashboard-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.somente-impressao { display: none; }
+
+@media print {
+    @page { size: A4 portrait; margin: 12mm; }
+
+    body.relatorio-caixa {
+        --cor-texto: #172033;
+        --cor-texto-secundario: #374151;
+        --cor-borda: #cbd5e1;
+        --cor-card: #fff;
+        --cor-fundo: #fff;
+        --cor-primaria: #19495b;
+        --cor-primaria-clara: #fff;
+        color: var(--cor-texto);
+        background: #fff;
+        font-size: 10pt;
+        line-height: 1.3;
+    }
+
+    .relatorio-caixa .ocultar-na-impressao,
+    .relatorio-caixa .secao-titulo p,
+    .relatorio-caixa .grafico-relatorio:not([hidden]) + .grafico-temperatura { display: none !important; }
+    .relatorio-caixa .somente-impressao { display: revert; }
+    .relatorio-caixa .dashboard { width: 100%; max-width: 186mm; margin: 0 auto; padding: 0; }
+    .relatorio-caixa .dashboard-cabecalho {
+        flex-direction: row;
+        align-items: center;
+        margin: 0 0 7pt;
+        padding-bottom: 5pt;
+        border-bottom: 1px solid var(--cor-borda);
+    }
+    .relatorio-caixa .dashboard-cabecalho h1 { margin: 4pt 0; font-size: 21pt; }
+    .relatorio-caixa .etiqueta { padding: 0; color: var(--cor-primaria); }
+    .relatorio-caixa .dashboard-secao {
+        break-inside: avoid;
+        margin: 0 0 5pt;
+        padding: 5pt 6pt;
+        border-radius: 6pt;
+        box-shadow: none;
+    }
+    .relatorio-caixa .secao-titulo { flex-direction: row; align-items: center; margin: 0 0 5pt; }
+    .relatorio-caixa .secao-titulo h2 { font-size: 12pt; }
+    .relatorio-caixa :is(.info-grid, .metricas-grid, .metricas-secundarias) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 5pt;
+    }
+    .relatorio-caixa .dados-linha { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5pt; }
+    .relatorio-caixa .faixa-temperatura { flex-direction: row; gap: 6pt; }
+    .relatorio-caixa .metricas-secundarias { margin-top: 5pt; }
+    .relatorio-caixa :is(.sensor-status, .info-card, .dados-linha > div, .faixa-card, .metrica-card, .metricas-secundarias > div) {
+        padding: 4pt 6pt;
+        color: var(--cor-texto);
+        background: #fff;
+        border: 1px solid var(--cor-borda);
+        box-shadow: none;
+    }
+    .relatorio-caixa :is(.sensor-status small, .status-temperatura, .metrica-valor, .faixa-card strong) { color: var(--cor-texto); }
+    .relatorio-caixa .status-temperatura { background: #fff; border: 1px solid var(--cor-borda); }
+    .relatorio-caixa :is(.info-valor, .metrica-valor, .faixa-card strong) { font-size: 14pt; }
+    .relatorio-caixa :is(.info-valor, .metrica-valor, .faixa-card strong) { margin-top: 2pt; }
+    .relatorio-caixa .grafico-legenda-info { margin: 0; padding: 0; font-size: 9pt; }
+    .relatorio-caixa .grafico-relatorio { display: block; width: 100%; }
+    .relatorio-caixa .grafico-temperatura[data-renderizado="false"] { height: auto; min-height: 0; }
+    .relatorio-caixa .grafico-sem-dados { min-height: 0; padding: 9pt; }
+}
+
 .leituras-tabela:not([hidden]) + .leituras-resumo {
     margin-top: 12px;
 }
