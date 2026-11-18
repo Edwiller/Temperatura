@@ -1,7 +1,7 @@
 import { protegerPagina } from "../config/acesso.js?v=gestao-1";
-import { listarCaixas } from "../services/caixaService.js?v=gestao-1";
+import { listarCaixas, listarCaixasHistoricas } from "../services/caixaService.js?v=exclusao-1";
 import { listarNomesSensores } from "../services/sensorService.js?v=gestao-1";
-import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=gestao-1";
+import { buscarTemperaturasGerais } from "../services/temperaturaService.js?v=exclusao-1";
 import { coresGrafico, eventoTemaPortal } from "../components/temaPortal.js?v=grafico-1";
 import { carregarECharts } from "../components/carregarECharts.js";
 import {
@@ -32,7 +32,8 @@ let nomesProntos;
 let cacheLeituras;
 
 function nomeDaOrigem(leitura) {
-    if (leitura.caixa_id != null) return caixasPorId.get(leitura.caixa_id) || `Caixa ${leitura.caixa_id}`;
+    const caixaId = leitura.caixa_id ?? leitura.caixa_id_historico;
+    if (caixaId != null) return caixasPorId.get(caixaId) || `Caixa ${caixaId}`;
     if (leitura.sensor_id != null) return sensoresPorId.get(leitura.sensor_id) || `Sensor ${leitura.sensor_id}`;
     return "Sem identificação";
 }
@@ -59,7 +60,7 @@ function mostrarMetricas(leituras) {
 function mostrarGrafico(leituras, dia) {
     const porCaixa = new Map();
     for (const leitura of leituras) {
-        const grupo = leitura.caixa_id ?? `sem-caixa-${leitura.sensor_id ?? ""}`;
+        const grupo = leitura.caixa_id ?? leitura.caixa_id_historico ?? `sem-caixa-${leitura.sensor_id ?? ""}`;
         if (!porCaixa.has(grupo)) {
             porCaixa.set(grupo, { nome: nomeDaOrigem(leitura), pontos: [] });
         }
@@ -122,7 +123,8 @@ async function carregarPeriodo(periodo, atualizar = false) {
             if (!imprimir.disabled && prefixo.length + novas.length === anterior.leituras.length && novas.every((leitura, indice) => {
                 const antiga = anterior.leituras[prefixo.length + indice];
                 return antiga.id === leitura.id && antiga.data === leitura.data && antiga.valor === leitura.valor
-                    && antiga.caixa_id === leitura.caixa_id && antiga.sensor_id === leitura.sensor_id;
+                    && antiga.caixa_id === leitura.caixa_id && antiga.caixa_id_historico === leitura.caixa_id_historico
+                    && antiga.sensor_id === leitura.sensor_id;
             })) return;
             leituras = prefixo.concat(novas);
         }
@@ -215,9 +217,12 @@ if (await protegerPagina("geral")) {
     atualizarRelogio();
     setInterval(atualizarRelogio, 1000);
 
-    nomesProntos = Promise.allSettled([listarCaixas({ incluirExcluidas: true }), listarNomesSensores()])
-        .then(([caixas, sensores]) => {
-            caixasPorId = new Map((caixas.value ?? []).map(caixa => [caixa.id, caixa.codigo]));
+    nomesProntos = Promise.allSettled([listarCaixas({ incluirExcluidas: true }), listarCaixasHistoricas(), listarNomesSensores()])
+        .then(([caixas, historicas, sensores]) => {
+            caixasPorId = new Map([
+                ...(caixas.value ?? []).map(caixa => [caixa.id, caixa.codigo]),
+                ...(historicas.value ?? []).map(caixa => [caixa.id, `${caixa.codigo} (excluída #${caixa.id})`])
+            ]);
             sensoresPorId = new Map((sensores.value ?? []).map(sensor => [sensor.id, sensor.nome || sensor.codigo]));
         });
     void carregarPeriodo(consultaAtual);

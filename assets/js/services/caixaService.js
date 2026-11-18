@@ -34,6 +34,11 @@ export async function listarCaixas({ incluirSensores = false, incluirExcluidas =
     return [...caixasPorId.values()];
 }
 
+export async function listarCaixasHistoricas() {
+    const supabase = await obterSupabase();
+    return buscarPaginas(supabase.from("caixas_historico").select("id,codigo,nome").order("id"));
+}
+
 async function alterarCaixa(funcao, parametros) {
     const supabase = await obterSupabase();
     const { error } = await supabase.rpc(funcao, parametros);

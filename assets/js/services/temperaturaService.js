@@ -25,7 +25,7 @@ async function lerEmPaginas(criarConsulta, mensagemDeErro) {
 export async function buscarTemperaturasGerais(inicio, fim) {
     const supabase = await obterSupabase();
     const consulta = () => supabase.from("temperaturas")
-        .select("id,valor,data,caixa_id,sensor_id")
+        .select("id,valor,data,caixa_id,caixa_id_historico,sensor_id")
         .gte("data", inicio)
         .lt("data", fim);
 
