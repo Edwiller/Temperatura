@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solicitar acesso | Monitoramento Térmico</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./assets/css/global.css">
+    <link rel="stylesheet" href="./assets/css/portal.css?v=admin-1">
+    <script type="module" src="./assets/js/pages/cadastro-usuario.js?v=admin-1"></script>
+</head>
+<body class="portal-login">
+    <main class="portal-login-layout">
+        <section class="portal-login-marca" aria-labelledby="tituloPortal">
+            <div class="portal-login-instituicao">
+                <span class="portal-simbolo" aria-hidden="true">T</span>
+                <span>Hemoacre</span>
+            </div>
+            <h1 id="tituloPortal">Monitoramento<br>térmico</h1>
+            <p>Acompanhe as temperaturas e as caixas de transporte de hemocomponentes.</p>
+        </section>
+        <section class="portal-login-formulario" aria-labelledby="tituloCadastro">
+            <h2 id="tituloCadastro">Solicitar acesso</h2>
+            <p>Informe seus dados. Sua conta será liberada pelo responsável pelo portal.</p>
+            <form id="formUsuario" method="post">
+                <label for="nome">Nome</label>
+                <input id="nome" name="nome" type="text" autocomplete="name" maxlength="100" required>
+                <label for="usuario">Usuário</label>
+                <input id="usuario" name="usuario" type="text" autocomplete="username" autocapitalize="none"
+                    spellcheck="false" minlength="3" maxlength="50" aria-describedby="ajudaUsuario" required>
+                <small id="ajudaUsuario">Use letras, números, pontos, hífens ou sublinhados.</small>
+                <label for="senha">Senha</label>
+                <input id="senha" name="senha" type="password" autocomplete="new-password"
+                    minlength="8" maxlength="72" aria-describedby="ajudaSenha" required>
+                <small id="ajudaSenha">Use pelo menos 8 caracteres.</small>
+                <label for="confirmarSenha">Confirme a senha</label>
+                <input id="confirmarSenha" name="confirmarSenha" type="password" autocomplete="new-password"
+                    minlength="8" maxlength="72" required>
+                <button type="submit" class="portal-botao" disabled>Enviar solicitação</button>
+                <p class="portal-mensagem" id="mensagemCadastro" role="alert"></p>
+            </form>
+            <a class="portal-link-acesso" href="./login.html">Voltar para o login</a>
+            <noscript>Ative o JavaScript para solicitar acesso.</noscript>
+        </section>
+    </main>
+</body>
+</html>

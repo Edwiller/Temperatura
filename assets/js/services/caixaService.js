@@ -1,7 +1,56 @@
 import {
     supabase
-} from "../config/supabase.js";
+} from "../config/supabase.js?v=implantacao-1";
 
+async function buscarPaginas(consulta) {
+    const registros = [];
+    const tamanhoPagina = 500;
+
+    for (let inicio = 0; ; inicio += tamanhoPagina) {
+        const { data, error } = await consulta.range(inicio, inicio + tamanhoPagina - 1);
+        if (error) throw new Error("Não foi possível carregar as caixas.");
+        registros.push(...data);
+        if (data.length < tamanhoPagina) return registros;
+    }
+}
+
+export async function listarCaixas({ incluirSensores = false } = {}) {
+    const consultaCaixas = supabase.from("caixas")
+        .select("id,codigo,nome,temperatura_min,temperatura_max")
+        .order("codigo").order("id");
+    if (!incluirSensores) return buscarPaginas(consultaCaixas);
+
+    const consultaSensores = supabase.from("sensores")
+        .select("id,codigo,ativo,caixa_id")
+        .not("caixa_id", "is", null)
+        .order("id");
+    const [caixas, sensores] = await Promise.all([buscarPaginas(consultaCaixas), buscarPaginas(consultaSensores)]);
+    const caixasPorId = new Map(caixas.map(caixa => [caixa.id, { ...caixa, sensores: [] }]));
+    for (const sensor of sensores) {
+        caixasPorId.get(sensor.caixa_id)?.sensores.push(sensor);
+    }
+    return [...caixasPorId.values()];
+}
+
+export async function cadastrarCaixaComSensor(caixa, sensorId, codigoNovoSensor) {
+    const { data, error } = await supabase.rpc("cadastrar_caixa_com_sensor", {
+        dados_caixa: caixa,
+        sensor_existente: sensorId || null,
+        codigo_novo_sensor: codigoNovoSensor || null
+    });
+
+    if (error?.code === "23505") {
+        throw new Error("O código da caixa ou do ESP já está cadastrado.");
+    }
+    if (error?.code === "P0001") {
+        throw new Error(error.message);
+    }
+    if (error?.code === "42501") {
+        throw new Error("Seu usuário ainda não tem acesso ao cadastro.");
+    }
+    if (error) throw new Error("Não foi possível cadastrar a caixa e associar o ESP.");
+    return data;
+}
 
 /* =========================================================
    CADASTRAR CAIXA

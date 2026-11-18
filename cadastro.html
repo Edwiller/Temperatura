@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Sistema de cadastro e monitoramento térmico de caixas.">
+
+    <title>Cadastro de Caixa | Monitoramento Térmico</title>
+
+    <link rel="icon" href="data:,">
+
+    <!-- CSS geral do sistema -->
+    <link rel="stylesheet" href="./assets/css/global.css">
+    <link rel="stylesheet" href="./assets/css/portal.css?v=admin-1">
+
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="./assets/css/cadastro.css">
+
+    <!-- JavaScript específico desta página -->
+    <script type="module" src="./assets/js/pages/cadastro.js?v=admin-1" defer></script>
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         CABEÇALHO
+    ====================================================== -->
+
+    <header data-portal-header hidden></header>
+    <p class="portal-acesso" data-portal-status role="status">Verificando acesso...</p>
+
+
+    <!-- =====================================================
+         CONTEÚDO PRINCIPAL
+    ====================================================== -->
+
+    <main class="pagina" data-portal-content hidden>
+
+        <!-- TÍTULO -->
+
+        <section class="pagina-cabecalho">
+
+            <div>
+
+                <span class="etiqueta">
+                    Nova caixa
+                </span>
+
+                <h1>
+                    Cadastrar caixa
+                </h1>
+
+                <p>
+                    Informe os dados da caixa e selecione
+                    o sensor responsável pelo monitoramento
+                    da temperatura.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FORMULÁRIO
+        ================================================== -->
+
+        <form id="formCaixa" class="formulario">
+
+            <!-- =============================================
+                 01 - IDENTIFICAÇÃO
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        01
+                    </span>
+
+                    <div>
+                        <h2>Identificação</h2>
+
+                        <p>
+                            Dados utilizados para identificar
+                            esta caixa no sistema.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid">
+
+                    <div class="campo">
+
+                        <label for="codigo">
+                            Código da caixa
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <input type="text" id="codigo" name="codigo" placeholder="Ex.: CX-001" maxlength="50"
+                            autocomplete="off" required>
+
+                        <small>
+                            Utilize um código único para cada caixa.
+                        </small>
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label for="nome">
+                            Nome / identificação
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <input type="text" id="nome" name="nome" placeholder="Ex.: Caixa transporte 01" maxlength="100"
+                            autocomplete="off" required>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 02 - DIMENSÕES
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        02
+                    </span>
+
+                    <div>
+                        <h2>Dimensões da caixa</h2>
+
+                        <p>
+                            Informe o volume e as dimensões
+                            físicas da caixa.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid campos-grid-4">
+
+                    <!-- VOLUME -->
+
+                    <div class="campo">
+
+                        <label for="volume">
+                            Volume
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="volume" name="volume" placeholder="0" min="0.01" step="0.01"
+                                required>
+
+                            <span>L</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COMPRIMENTO -->
+
+                    <div class="campo">
+
+                        <label for="comprimento">
+                            Comprimento
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="comprimento" name="comprimento" placeholder="0" min="0"
+                                step="0.01">
+
+                            <span>cm</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LARGURA -->
+
+                    <div class="campo">
+
+                        <label for="largura">
+                            Largura
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="largura" name="largura" placeholder="0" min="0" step="0.01">
+
+                            <span>cm</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ALTURA -->
+
+                    <div class="campo">
+
+                        <label for="altura">
+                            Altura
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="altura" name="altura" placeholder="0" min="0" step="0.01">
+
+                            <span>cm</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 03 - CONTEÚDO
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        03
+                    </span>
+
+                    <div>
+                        <h2>Conteúdo da caixa</h2>
+
+                        <p>
+                            Informe a quantidade de hemocomponentes transportados
+                            e a quantidade de Gelox utilizada.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid">
+
+                    <!-- HEMOCOMPONENTES -->
+
+                    <div class="campo">
+
+                        <label for="hemocomponentes">
+                            Quantidade de hemocomponentes
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <input type="number" id="hemocomponentes" name="hemocomponentes" value="0" min="0" step="1"
+                            required>
+
+                    </div>
+
+
+                    <!-- GELOX -->
+
+                    <div class="campo">
+
+                        <label for="gelo">
+                            Quantidade de Gelox
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="gelo" name="gelo" value="0" min="0" step="0.01" required>
+
+                            <span>kg</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 04 - TEMPERATURA
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        04
+                    </span>
+
+                    <div>
+                        <h2>Faixa de temperatura</h2>
+
+                        <p>
+                            Defina os limites que serão usados
+                            posteriormente na análise dos dados.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="campos-grid">
+
+                    <!-- MÍNIMA -->
+
+                    <div class="campo">
+
+                        <label for="temperaturaMin">
+                            Temperatura mínima
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="temperaturaMin" name="temperaturaMin" placeholder="Ex.: 2"
+                                step="0.01" required>
+
+                            <span>°C</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MÁXIMA -->
+
+                    <div class="campo">
+
+                        <label for="temperaturaMax">
+                            Temperatura máxima
+                            <span class="obrigatorio">*</span>
+                        </label>
+
+                        <div class="campo-unidade">
+
+                            <input type="number" id="temperaturaMax" name="temperaturaMax" placeholder="Ex.: 8"
+                                step="0.01" required>
+
+                            <span>°C</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="aviso">
+
+                    <span class="aviso-icone">
+                        i
+                    </span>
+
+                    <p>
+                        As temperaturas registradas serão
+                        comparadas com essa faixa para identificar
+                        leituras normais e fora do limite.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 05 - SENSOR
+            ============================================== -->
+
+            <section class="formulario-secao">
+
+                <div class="secao-cabecalho">
+
+                    <span class="secao-numero">
+                        05
+                    </span>
+
+                    <div>
+
+                        <h2>
+                            Sensor de temperatura
+                        </h2>
+
+                        <p>
+                            Selecione um sensor disponível ou cadastre o código de um novo ESP.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ESTADO DE CARREGAMENTO -->
+
+                <div id="sensorCarregando" class="sensor-carregando">
+
+                    <span class="carregando-spinner"></span>
+
+                    Carregando sensores disponíveis...
+
+                </div>
+
+
+                <!-- SELECT DO SENSOR -->
+
+                <div id="sensorContainer" class="campo sensor-container oculto">
+
+                    <label for="sensor">
+                        Dispositivo ESP
+                        <span class="obrigatorio">*</span>
+                    </label>
+
+                    <select id="sensor" name="sensor" required>
+
+                        <option value="">
+                            Selecione um sensor
+                        </option>
+
+                    </select>
+
+
+                    <small>
+                        Somente sensores ativos e não associados
+                        a outra caixa serão exibidos.
+                    </small>
+
+                </div>
+
+
+                <div id="camposNovoSensor" class="campo sensor-container oculto">
+                    <label for="codigoNovoSensor">Código do novo ESP</label>
+                    <input id="codigoNovoSensor" name="codigoNovoSensor" maxlength="100"
+                        pattern="[A-Za-z0-9][A-Za-z0-9._\-]{0,99}" placeholder="ESP-002" disabled>
+                    <small>Use o mesmo código configurado no dispositivo.</small>
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 MENSAGENS
+            ============================================== -->
+
+            <div id="mensagem" class="mensagem oculto" role="alert" aria-live="polite">
+            </div>
+
+
+            <!-- =============================================
+                 BOTÕES
+            ============================================== -->
+
+            <div class="formulario-acoes">
+                <a id="abrirCaixa" class="portal-botao" hidden>Ver dashboard da caixa</a>
+
+                <button type="reset" id="btnLimpar" class="botao botao-secundario">
+                    Limpar formulário
+                </button>
+
+
+                <button type="submit" id="btnSalvar" class="botao botao-principal" disabled>
+
+                    <span id="btnSalvarTexto">
+                        Cadastrar caixa
+                    </span>
+
+                    <span id="btnSalvarSpinner" class="botao-spinner oculto">
+                    </span>
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </main>
+
+
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Caixas | Monitoramento Térmico</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./assets/css/global.css">
+    <link rel="stylesheet" href="./assets/css/portal.css?v=admin-1">
+    <script type="module" src="./assets/js/pages/caixas.js?v=admin-1"></script>
+</head>
+<body>
+    <header data-portal-header hidden></header>
+    <p class="portal-acesso" data-portal-status role="status">Verificando acesso...</p>
+    <main class="portal-pagina" data-portal-content hidden>
+        <div class="portal-titulo">
+            <div>
+                <h1>Caixas</h1>
+                <p>Abra uma caixa para consultar o sensor e as leituras de temperatura.</p>
+            </div>
+            <a class="portal-botao" href="./cadastro.html">Nova caixa</a>
+        </div>
+        <div class="portal-lista-controles" id="controlesCaixas" hidden>
+            <label for="buscarCaixa">Buscar caixa
+                <input type="search" id="buscarCaixa" placeholder="Nome, código ou ESP">
+            </label>
+        </div>
+        <p id="estadoCaixas" class="portal-estado" role="status">Carregando caixas...</p>
+        <ul id="listaCaixas" class="portal-caixas"></ul>
+    </main>
+</body>
+</html>

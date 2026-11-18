@@ -1,517 +1,80 @@
-    let grafico = null;
+import { coresGrafico, eventoTemaPortal } from "./temaPortal.js?v=grafico-1";
+import { dataDasLeituras, limitesDoGraficoDiario, opcoesGraficoLeituras, serieDeLeituras } from "./graficoLeituras.js?v=dia-completo-1";
 
+let grafico = null;
 
-    /* =========================================================
-    FORMATAR DATA/HORA
-    ========================================================= */
+function mostrarSemDados(container) {
+    grafico?.dispose();
+    grafico = null;
 
-    function formatarHorario(data) {
+    const mensagem = document.createElement("div");
+    mensagem.className = "grafico-sem-dados";
+    mensagem.textContent = "Nenhuma temperatura registrada para esta caixa.";
+    container.replaceChildren(mensagem);
+    container.dataset.renderizado = "false";
+    container.dataset.quantidadePontos = "0";
+}
 
-        const objetoData =
-            new Date(data);
+function serieLimite(nome, pontos, limite, cor) {
+    return {
+        name: nome,
+        type: "line",
+        data: pontos.map(([horario]) => [horario, limite]),
+        showSymbol: false,
+        lineStyle: { color: cor, type: "dashed", width: 1.5 },
+        itemStyle: { color: cor }
+    };
+}
 
+export function mostrarGraficoTemperatura(registros, temperaturaMin, temperaturaMax, dia) {
+    const container = document.getElementById("graficoTemperatura");
+    if (!container) throw new Error("Container do gráfico não encontrado.");
 
-        if (
-            Number.isNaN(
-                objetoData.getTime()
-            )
-        ) {
+    const pontos = (Array.isArray(registros) ? registros : [])
+        .filter(registro => registro.valor != null)
+        .map(registro => [Date.parse(registro.data), Number(registro.valor)])
+        .filter(([horario, valor]) => Number.isFinite(horario) && Number.isFinite(valor))
+        .sort(([anterior], [posterior]) => anterior - posterior);
 
-            return "--:--";
-
-        }
-
-
-        return objetoData
-            .toLocaleTimeString(
-                "pt-BR",
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
+    if (!pontos.length) {
+        mostrarSemDados(container);
+        return;
     }
-
-
-    /* =========================================================
-    FORMATAR DATA COMPLETA
-    ========================================================= */
-
-    function formatarDataCompleta(data) {
-
-        const objetoData =
-            new Date(data);
-
-
-        if (
-            Number.isNaN(
-                objetoData.getTime()
-            )
-        ) {
-
-            return "Data inválida";
-
-        }
-
-
-        return objetoData
-            .toLocaleString(
-                "pt-BR"
-            );
-    }
-
-
-    /* =========================================================
-    DESTRUIR GRÁFICO
-    ========================================================= */
-
-    function destruirGrafico() {
-
-        if (grafico) {
-
-            grafico.dispose();
-
-            grafico = null;
-
-        }
-
-    }
-
-
-    /* =========================================================
-    SEM DADOS
-    ========================================================= */
-
-    function mostrarSemDados(
-        container
-    ) {
-
-        destruirGrafico();
-
-
-        container.innerHTML = `
-            <div class="grafico-sem-dados">
-                Nenhuma temperatura registrada
-                para esta caixa.
-            </div>
-        `;
-
-
-        container.dataset.renderizado =
-            "false";
-
-
-        container.dataset.quantidadePontos =
-            "0";
-    }
-
-
-    /* =========================================================
-    MOSTRAR GRÁFICO
-    ========================================================= */
-
-    export function mostrarGraficoTemperatura(
-        registros,
-        temperaturaMin,
-        temperaturaMax
-    ) {
-
-        const container =
-            document.getElementById(
-                "graficoTemperatura"
-            );
-
-
-        if (!container) {
-
-            throw new Error(
-                "Container do gráfico não encontrado."
-            );
-
-        }
-
-
-        if (
-            !Array.isArray(registros) ||
-            registros.length === 0
-        ) {
-
-            mostrarSemDados(
-                container
-            );
-
-            return;
-
-        }
-
-
-        if (
-            typeof window.echarts ===
-            "undefined"
-        ) {
-
-            throw new Error(
-                "ECharts não foi carregado."
-            );
-
-        }
-
-
-        /* =====================================================
-        PREPARAR DADOS
-        ===================================================== */
-
-        const registrosValidos =
-            registros
-                .filter(
-                    registro =>
-                        Number.isFinite(
-                            Number(
-                                registro.valor
-                            )
-                        )
-                )
-                .sort(
-                    (
-                        registroA,
-                        registroB
-                    ) =>
-                        new Date(
-                            registroA.data
-                        ) -
-                        new Date(
-                            registroB.data
-                        )
-                );
-
-
-        if (
-            registrosValidos.length === 0
-        ) {
-
-            mostrarSemDados(
-                container
-            );
-
-            return;
-
-        }
-
-
-        const horarios =
-            registrosValidos.map(
-                registro =>
-                    formatarHorario(
-                        registro.data
-                    )
-            );
-
-
-        const valores =
-            registrosValidos.map(
-                registro =>
-                    Number(
-                        registro.valor
-                    )
-            );
-
-
-        const datasCompletas =
-            registrosValidos.map(
-                registro =>
-                    formatarDataCompleta(
-                        registro.data
-                    )
-            );
-
-
-        const minimo =
-            Number(
-                temperaturaMin
-            );
-
-
-        const maximo =
-            Number(
-                temperaturaMax
-            );
-
-
-        /* =====================================================
-        LIMPAR CONTAINER
-        ===================================================== */
-
-        container.innerHTML = "";
-
-
-        destruirGrafico();
-
-
-        /* =====================================================
-        CRIAR INSTÂNCIA
-        ===================================================== */
-
-        grafico =
-            window.echarts.init(
-                container
-            );
-
-
-        /* =====================================================
-        CONFIGURAÇÃO
-        ===================================================== */
-
-        const configuracao = {
-
-            tooltip: {
-
-                trigger: "axis",
-
-                formatter:
-                    function (parametros) {
-
-                        const indice =
-                            parametros[0]
-                                .dataIndex;
-
-
-                        const temperatura =
-                            valores[
-                                indice
-                            ];
-
-
-                        const data =
-                            datasCompletas[
-                                indice
-                            ];
-
-
-                        return `
-                            <strong>
-                                ${data}
-                            </strong>
-
-                            <br>
-
-                            Temperatura:
-                            <strong>
-                                ${temperatura.toLocaleString(
-                                    "pt-BR",
-                                    {
-                                        minimumFractionDigits: 1,
-                                        maximumFractionDigits: 2
-                                    }
-                                )} °C
-                            </strong>
-                        `;
-
-                    }
-
-            },
-
-
-            legend: {
-
-                data: [
-                    "Temperatura",
-                    "Limite mínimo",
-                    "Limite máximo"
-                ],
-
-                bottom: 0
-
-            },
-
-
-            grid: {
-
-                left: 50,
-
-                right: 30,
-
-                top: 30,
-
-                bottom: 70,
-
-                containLabel: true
-
-            },
-
-
-            xAxis: {
-
-                type: "category",
-
-                boundaryGap: false,
-
-                data: horarios,
-
-                axisLabel: {
-
-                    hideOverlap: true
-
-                }
-
-            },
-
-
-            yAxis: {
-
-                type: "value",
-
-                name: "°C",
-
-                scale: true
-
-            },
-
-
-            series: [
-
-                /* =========================================
-                TEMPERATURA
-                ========================================= */
-
-                {
-
-                    name:
-                        "Temperatura",
-
-                    type:
-                        "line",
-
-                    data:
-                        valores,
-
-                    smooth:
-                        true,
-
-                    symbol:
-                        "circle",
-
-                    symbolSize:
-                        7,
-
-                    connectNulls:
-                        false
-
-                },
-
-
-                /* =========================================
-                LIMITE MÍNIMO
-                ========================================= */
-
-                {
-
-                    name:
-                        "Limite mínimo",
-
-                    type:
-                        "line",
-
-                    data:
-                        valores.map(
-                            () =>
-                                minimo
-                        ),
-
-                    symbol:
-                        "none",
-
-                    lineStyle: {
-
-                        type:
-                            "dashed",
-
-                        width:
-                            1
-
-                    }
-
-                },
-
-
-                /* =========================================
-                LIMITE MÁXIMO
-                ========================================= */
-
-                {
-
-                    name:
-                        "Limite máximo",
-
-                    type:
-                        "line",
-
-                    data:
-                        valores.map(
-                            () =>
-                                maximo
-                        ),
-
-                    symbol:
-                        "none",
-
-                    lineStyle: {
-
-                        type:
-                            "dashed",
-
-                        width:
-                            1
-
-                    }
-
-                }
-
-            ]
-
+    if (!window.echarts) throw new Error("ECharts não foi carregado.");
+
+    const medicao = serieDeLeituras("Temperatura", pontos);
+    medicao.sampling = "none";
+    const series = [medicao];
+    const minimo = Number(temperaturaMin);
+    const maximo = Number(temperaturaMax);
+    if (temperaturaMin != null && temperaturaMax != null
+        && Number.isFinite(minimo) && Number.isFinite(maximo) && minimo < maximo) {
+        medicao.markArea = {
+            silent: true,
+            itemStyle: { color: "rgba(68, 158, 117, 0.10)" },
+            data: [[{ yAxis: minimo }, { yAxis: maximo }]]
         };
-
-
-        /* =====================================================
-        RENDERIZAR
-        ===================================================== */
-
-        grafico.setOption(
-            configuracao
+        series.push(
+            serieLimite("Limite mínimo", pontos, minimo, "#348668"),
+            serieLimite("Limite máximo", pontos, maximo, "#cd705c")
         );
-
-
-        /* =====================================================
-        INFORMAÇÕES PARA TESTES
-        ===================================================== */
-
-        container.dataset.renderizado =
-            "true";
-
-
-        container.dataset.quantidadePontos =
-            registrosValidos.length;
-
-
-        console.log(
-            `[GRÁFICO] ${registrosValidos.length} pontos renderizados.`
-        );
-
     }
 
+    if (!grafico) {
+        container.replaceChildren();
+        grafico = window.echarts.init(container);
+    }
 
-    /* =========================================================
-    RESPONSIVIDADE
-    ========================================================= */
+    const umDia = dataDasLeituras.format(pontos[0][0]) === dataDasLeituras.format(pontos.at(-1)[0]);
+    const limites = dia ? limitesDoGraficoDiario(dia, pontos[0][0]) : undefined;
+    const opcoes = opcoesGraficoLeituras(umDia, limites);
+    // O cursor acompanha o mouse e o tooltip identifica a leitura registrada mais próxima.
+    opcoes.xAxis.axisPointer.snap = false;
+    grafico.setOption({ ...opcoes, series }, { notMerge: true });
+    grafico.setOption(coresGrafico());
+    container.dataset.renderizado = "true";
+    container.dataset.quantidadePontos = String(pontos.length);
+}
 
-    window.addEventListener(
-        "resize",
-        () => {
-
-            if (grafico) {
-
-                grafico.resize();
-
-            }
-
-        }
-    );
+window.addEventListener(eventoTemaPortal, () => grafico?.setOption(coresGrafico()));
+window.addEventListener("resize", () => grafico?.resize());

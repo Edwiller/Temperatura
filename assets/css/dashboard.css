@@ -915,6 +915,53 @@
 
 }
 
+.leituras-tabela {
+    max-height: 360px;
+    overflow: auto;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-medio);
+}
+
+.leituras-tabela table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+    font-size: 13px;
+}
+
+.leituras-tabela th,
+.leituras-tabela td {
+    padding: 10px 12px;
+    overflow-wrap: anywhere;
+}
+
+.leituras-tabela th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+}
+
+.leituras-tabela td {
+    border-top: 1px solid var(--cor-borda);
+}
+
+.leituras-resumo {
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+}
+
+.leituras-tabela:not([hidden]) + .leituras-resumo {
+    margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+    .leituras-tabela th,
+    .leituras-tabela td {
+        padding: 8px;
+    }
+}
+
 /* =========================================================
    FILTROS
 ========================================================= */

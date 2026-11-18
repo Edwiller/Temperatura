@@ -1,4 +1,8 @@
+import { coresGrafico, eventoTemaPortal } from "./temaPortal.js";
+
 let graficoComparativo = null;
+
+window.addEventListener(eventoTemaPortal, () => graficoComparativo?.setOption(coresGrafico()));
 
 
 /* =========================================================
@@ -212,6 +216,7 @@ export function mostrarGraficoComparativo(
     graficoComparativo.setOption(
         configuracao
     );
+    graficoComparativo.setOption(coresGrafico());
 
 
     container.dataset.renderizado =

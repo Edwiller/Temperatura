@@ -14,28 +14,13 @@
     <link rel="icon" href="data:,">
 
     <link rel="stylesheet" href="./assets/css/global.css">
+    <link rel="stylesheet" href="./assets/css/portal.css?v=admin-1">
 
     <link rel="stylesheet" href="./assets/css/dashboard.css">
 
     <script src="https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js" defer></script>
 
-    <script type="module" src="./assets/js/pages/dashboard.js" defer></script>
-
-    <script type="module" src="./assets/js/tests/dashboardTest.js" defer></script>
-
-    <script type="module" src="./assets/js/tests/temperaturaServiceTest.js" defer></script>
-
-    <script type="module" src="./assets/js/tests/metricasIntegracaoTest.js" defer></script>
-
-    <script type="module" src="./assets/js/tests/cardsTest.js" defer></script>
-
-    <script type="module" src="./assets/js/tests/graficoTemperaturaTest.js" defer></script>
-
-    <script type="module" src="./assets/js/tests/comparativoTest.js" defer></script>
-
-
-
-
+    <script type="module" src="./assets/js/pages/dashboard.js?v=admin-1" defer></script>
 
 </head>
 
@@ -48,59 +33,15 @@
          TOPO
     ====================================================== -->
 
-    <header class="topo">
-
-
-        <div class="topo-conteudo">
-
-
-            <div class="marca">
-
-
-                <div class="marca-icone">
-
-                    T
-
-                </div>
-
-
-                <div class="marca-texto">
-
-
-                    <strong>
-                        Monitoramento Térmico
-                    </strong>
-
-
-                    <span>
-                        Dashboard da caixa
-                    </span>
-
-
-                </div>
-
-
-            </div>
-
-
-            <a href="./index.html" class="botao-voltar">
-
-                Nova caixa
-
-            </a>
-
-
-        </div>
-
-
-    </header>
+    <header data-portal-header hidden></header>
+    <p class="portal-acesso" data-portal-status role="status">Verificando acesso...</p>
 
 
     <!-- =====================================================
          DASHBOARD
     ====================================================== -->
 
-    <main class="dashboard">
+    <main class="dashboard" data-portal-content hidden>
 
 
         <!-- =================================================
@@ -137,9 +78,9 @@
             </p>
 
 
-            <a href="./index.html" class="botao botao-secundario">
+            <a href="./caixas.html" class="botao botao-secundario">
 
-                Voltar ao cadastro
+                Voltar para caixas
 
             </a>
 
@@ -315,7 +256,7 @@
 
 
                         <span class="info-label">
-                            Peso do gelo
+                            Quantidade de Gelox
                         </span>
 
 
@@ -894,6 +835,32 @@
                 </div>
 
 
+            </section>
+
+
+            <!-- =================================================
+                 LEITURAS DE TEMPERATURA
+            ================================================== -->
+
+            <section class="dashboard-secao" aria-labelledby="leiturasTitulo">
+                <div class="secao-titulo">
+                    <h2 id="leiturasTitulo">Leituras de temperatura</h2>
+                </div>
+
+                <div id="leiturasTabela" class="leituras-tabela" role="region" aria-labelledby="leiturasTitulo"
+                    tabindex="0" hidden>
+                    <table aria-labelledby="leiturasTitulo">
+                        <thead>
+                            <tr>
+                                <th scope="col">Data e hora</th>
+                                <th scope="col">Temperatura (°C)</th>
+                                <th scope="col">Código da caixa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leiturasCorpo"></tbody>
+                    </table>
+                </div>
+                <p id="leiturasResumo" class="leituras-resumo" role="status"></p>
             </section>
 
 

@@ -4,22 +4,22 @@
 
 import {
     buscarCaixaPorId
-} from "../services/caixaService.js";
+} from "../services/caixaService.js?v=implantacao-1";
 
+import { protegerPagina } from "../config/acesso.js?v=admin-1";
 
 import {
     buscarSensorPorCaixa
-} from "../services/sensorService.js";
+} from "../services/sensorService.js?v=implantacao-1";
 
 
 import {
     buscarTemperaturasPorPeriodo
-} from "../services/temperaturaService.js";
+} from "../services/temperaturaService.js?v=implantacao-1";
 
 
 import {
     horasAtras,
-    inicioDoDiaAtual,
     agora,
     converterDataLocalParaISO,
     validarPeriodo
@@ -38,7 +38,11 @@ import {
 
 import {
     mostrarGraficoTemperatura
-} from "../components/graficoTemperatura.js";
+} from "../components/graficoTemperatura.js?v=cursor-leituras-1";
+
+import {
+    dataDasLeituras, diaDasLeiturasNaUrl, fusoDasLeituras, inicioDoDiaNoAcre
+} from "../components/graficoLeituras.js?v=dia-completo-1";
 
 
 import {
@@ -49,7 +53,7 @@ import {
 import {
     mostrarGraficoComparativo,
     limparGraficoComparativo
-} from "../components/graficoComparativo.js";
+} from "../components/graficoComparativo.js?v=portal-5";
 
 
 /* =========================================================
@@ -79,6 +83,9 @@ const dashboardConteudo =
         "dashboardConteudo"
     );
 
+const leiturasTabela = document.getElementById("leiturasTabela");
+const leiturasCorpo = document.getElementById("leiturasCorpo");
+const leiturasResumo = document.getElementById("leiturasResumo");
 
 /* =========================================================
    ELEMENTOS DO FILTRO
@@ -173,6 +180,7 @@ const comparativoResultado =
 let caixaAtual =
     null;
 
+let ultimaConsultaMonitoramento = 0;
 
 /* =========================================================
    ESTADOS VISUAIS
@@ -536,10 +544,47 @@ function mostrarDadosSensor(
    ATUALIZAR MONITORAMENTO
 ========================================================= */
 
+const formatadorDataLeitura = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: fusoDasLeituras,
+    dateStyle: "short",
+    timeStyle: "medium"
+});
+
+function mostrarLeituras(temperaturas, caixa) {
+    const linhas = document.createDocumentFragment();
+    const codigoCaixa = caixa.codigo || String(caixa.id);
+
+    // O serviço retorna as leituras em ordem crescente de data.
+    for (let indice = temperaturas.length - 1; indice >= 0; indice--) {
+        const leitura = temperaturas[indice];
+        const linha = document.createElement("tr");
+        const dataLeitura = new Date(leitura.data);
+
+        const horario = linha.insertCell();
+        const instante = document.createElement("time");
+        instante.dateTime = leitura.data;
+        instante.textContent = formatadorDataLeitura.format(dataLeitura);
+        horario.append(instante);
+
+        linha.insertCell().textContent = formatarNumero(leitura.valor);
+        linha.insertCell().textContent = codigoCaixa;
+        linhas.append(linha);
+    }
+
+    leiturasCorpo.replaceChildren(linhas);
+    leiturasTabela.hidden = temperaturas.length === 0;
+    leiturasResumo.textContent = temperaturas.length === 0
+        ? "Nenhuma leitura registrada no período selecionado."
+        : temperaturas.length === 1
+            ? "1 leitura no período selecionado."
+            : `${formatarNumero(temperaturas.length)} leituras no período selecionado.`;
+}
+
 async function atualizarMonitoramento(
     inicio,
     fim,
-    periodo
+    periodo,
+    dia
 ) {
 
     if (!caixaAtual) {
@@ -552,6 +597,8 @@ async function atualizarMonitoramento(
 
     }
 
+
+    const consulta = ++ultimaConsultaMonitoramento;
 
     console.group(
         "ATUALIZAR MONITORAMENTO"
@@ -579,6 +626,9 @@ async function atualizarMonitoramento(
                 fim
             );
 
+        if (consulta !== ultimaConsultaMonitoramento) {
+            return;
+        }
 
         console.log(
             `🌡️ ${temperaturas.length} temperatura(s) encontrada(s).`
@@ -611,9 +661,11 @@ async function atualizarMonitoramento(
         mostrarGraficoTemperatura(
             temperaturas,
             caixaAtual.temperatura_min,
-            caixaAtual.temperatura_max
+            caixaAtual.temperatura_max,
+            dia
         );
 
+        mostrarLeituras(temperaturas, caixaAtual);
 
         if (periodo) {
 
@@ -624,11 +676,15 @@ async function atualizarMonitoramento(
 
 
         console.log(
-            "✅ Cards e gráfico atualizados."
+            "✅ Cards, gráfico e leituras atualizados."
         );
 
 
     } catch (erro) {
+
+        if (consulta !== ultimaConsultaMonitoramento) {
+            return;
+        }
 
         console.error(
             "❌ Erro ao atualizar monitoramento:",
@@ -724,10 +780,12 @@ filtroPeriodo.addEventListener(
             "hoje"
         ) {
 
+            const dia = dataDasLeituras.format(new Date());
             await atualizarMonitoramento(
-                inicioDoDiaAtual(),
+                new Date(inicioDoDiaNoAcre(dia)).toISOString(),
                 agora(),
-                "hoje"
+                "hoje",
+                dia
             );
 
         }
@@ -747,16 +805,17 @@ btnAplicarPeriodo.addEventListener(
         esconderMensagemFiltro();
 
 
-        const inicio =
-            converterDataLocalParaISO(
-                dataInicio.value
-            );
-
-
-        const fim =
-            converterDataLocalParaISO(
-                dataFim.value
-            );
+        const [data, horarioInicial] = dataInicio.value.split("T");
+        const dia = dataFim.value === `${data}T23:59` && ["00:00", "00:01"].includes(horarioInicial)
+            ? data
+            : null;
+        const inicioAcre = dia ? inicioDoDiaNoAcre(dia) : null;
+        const inicio = dia
+            ? new Date(inicioAcre + (horarioInicial === "00:01" ? 60000 : 0)).toISOString()
+            : converterDataLocalParaISO(dataInicio.value);
+        const fim = dia
+            ? new Date(inicioAcre + 86400000 - 1).toISOString()
+            : converterDataLocalParaISO(dataFim.value);
 
 
         const validacao =
@@ -797,7 +856,8 @@ btnAplicarPeriodo.addEventListener(
             await atualizarMonitoramento(
                 inicio,
                 fim,
-                "personalizado"
+                "personalizado",
+                dia
             );
 
 
@@ -1329,15 +1389,20 @@ async function iniciarDashboard() {
 
 
         /* =================================================
-           3. ÚLTIMAS 24 HORAS
+           3. PERÍODO INICIAL
         ================================================= */
 
-        const inicio =
-            horasAtras(24);
+        const diaInicial = diaDasLeiturasNaUrl();
+        const inicioAcre = diaInicial ? inicioDoDiaNoAcre(diaInicial) : null;
+        const inicio = diaInicial ? new Date(inicioAcre + 60000).toISOString() : horasAtras(24);
+        const fim = diaInicial ? new Date(inicioAcre + 86400000 - 1).toISOString() : agora();
 
-
-        const fim =
-            agora();
+        if (diaInicial) {
+            filtroPeriodo.value = "personalizado";
+            periodoPersonalizado.classList.remove("oculto");
+            dataInicio.value = `${diaInicial}T00:01`;
+            dataFim.value = `${diaInicial}T23:59`;
+        }
 
 
         const temperaturas =
@@ -1349,7 +1414,7 @@ async function iniciarDashboard() {
 
 
         console.log(
-            `🌡️ ${temperaturas.length} temperaturas carregadas nas últimas 24 horas.`
+            `🌡️ ${temperaturas.length} temperaturas carregadas no período inicial.`
         );
 
 
@@ -1406,12 +1471,16 @@ async function iniciarDashboard() {
            8. GRÁFICO
         ================================================= */
 
+        mostrarConteudo();
+
         mostrarGraficoTemperatura(
             temperaturas,
             caixa.temperatura_min,
-            caixa.temperatura_max
+            caixa.temperatura_max,
+            diaInicial
         );
 
+        mostrarLeituras(temperaturas, caixa);
 
         /* =================================================
            9. INFORMAÇÕES PARA TESTES
@@ -1422,7 +1491,7 @@ async function iniciarDashboard() {
 
 
         dashboardConteudo.dataset.periodo =
-            "24h";
+            diaInicial ? "personalizado" : "24h";
 
 
         if (sensor) {
@@ -1431,13 +1500,6 @@ async function iniciarDashboard() {
                 sensor.id;
 
         }
-
-
-        /* =================================================
-           10. EXIBIR
-        ================================================= */
-
-        mostrarConteudo();
 
 
         console.log(
@@ -1471,4 +1533,4 @@ async function iniciarDashboard() {
    EXECUTAR
 ========================================================= */
 
-iniciarDashboard();
+if (await protegerPagina("caixas")) await iniciarDashboard();

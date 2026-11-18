@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar | Monitoramento Térmico</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./assets/css/global.css">
+    <link rel="stylesheet" href="./assets/css/portal.css?v=admin-1">
+    <script type="module" src="./assets/js/pages/login.js?v=admin-1"></script>
+</head>
+<body class="portal-login">
+    <main class="portal-login-layout">
+        <section class="portal-login-marca" aria-labelledby="tituloPortal">
+            <div class="portal-login-instituicao">
+                <span class="portal-simbolo" aria-hidden="true">T</span>
+                <span>Hemoacre</span>
+            </div>
+            <h1 id="tituloPortal">Monitoramento<br>térmico</h1>
+            <p>Acompanhe as temperaturas e as caixas de transporte de hemocomponentes.</p>
+        </section>
+        <section class="portal-login-formulario" aria-labelledby="tituloLogin">
+            <h2 id="tituloLogin">Entrar no sistema</h2>
+            <p>Use sua conta de acesso do Hemoacre.</p>
+            <p id="avisoCadastro" class="portal-aviso" role="status" hidden>
+                Solicitação recebida. Aguarde a liberação antes de entrar.
+            </p>
+            <form id="formLogin" method="post">
+                <label for="usuario">Usuário</label>
+                <input id="usuario" name="usuario" type="text" autocomplete="username" autocapitalize="none"
+                    spellcheck="false" maxlength="254" required>
+                <label for="senha">Senha</label>
+                <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+                <button type="submit" class="portal-botao" disabled>Entrar</button>
+                <p class="portal-mensagem" id="mensagemLogin" role="alert"></p>
+            </form>
+            <a class="portal-link-acesso" href="./cadastro-usuario.html">Solicitar acesso</a>
+            <noscript>Ative o JavaScript para entrar no sistema.</noscript>
+        </section>
+    </main>
+</body>
+</html>

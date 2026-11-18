@@ -1,17 +1,10 @@
-import {
-    listarSensoresDisponiveis,
-    associarSensorCaixa
-} from "../services/sensorService.js";
-
-
-import {
-    cadastrarCaixa
-} from "../services/caixaService.js";
-
+import { protegerPagina } from "../config/acesso.js?v=admin-1";
+import { listarSensoresDisponiveis } from "../services/sensorService.js?v=implantacao-1";
+import { cadastrarCaixaComSensor } from "../services/caixaService.js?v=implantacao-1";
 
 import {
     validarCaixa
-} from "../utils/validacoes.js";
+} from "../utils/validacoes.js?v=portal-2";
 
 
 /* =========================================================
@@ -38,11 +31,9 @@ const sensorContainer =
     );
 
 
-const semSensores =
-    document.getElementById(
-        "semSensores"
-    );
-
+const camposNovoSensor = document.getElementById("camposNovoSensor");
+const codigoNovoSensor = document.getElementById("codigoNovoSensor");
+const abrirCaixa = document.getElementById("abrirCaixa");
 
 const mensagem =
     document.getElementById(
@@ -73,63 +64,14 @@ const btnSalvarSpinner =
    ESTADOS VISUAIS DO SENSOR
 ========================================================= */
 
-function mostrarCarregamento() {
-
-    sensorCarregando
-        .classList
-        .remove("oculto");
-
-
-    sensorContainer
-        .classList
-        .add("oculto");
-
-
-    semSensores
-        .classList
-        .add("oculto");
-
+function atualizarCamposSensor() {
+    const novoSensor = sensorSelect.value === "novo";
+    camposNovoSensor.classList.toggle("oculto", !novoSensor);
+    codigoNovoSensor.disabled = !novoSensor;
+    codigoNovoSensor.required = novoSensor;
 }
 
-
-function mostrarSelect() {
-
-    sensorCarregando
-        .classList
-        .add("oculto");
-
-
-    sensorContainer
-        .classList
-        .remove("oculto");
-
-
-    semSensores
-        .classList
-        .add("oculto");
-
-}
-
-
-function mostrarSemSensores() {
-
-    sensorCarregando
-        .classList
-        .add("oculto");
-
-
-    sensorContainer
-        .classList
-        .add("oculto");
-
-
-    semSensores
-        .classList
-        .remove("oculto");
-
-}
-
-
+sensorSelect.addEventListener("change", atualizarCamposSensor);
 
 /* =========================================================
    MENSAGENS
@@ -203,117 +145,25 @@ function definirProcessando(
    SENSORES
 ========================================================= */
 
-function preencherSelectSensores(
-    sensores
-) {
-
-    sensorSelect.innerHTML = `
-        <option value="">
-            Selecione um sensor
-        </option>
-    `;
-
-
-    sensores.forEach(
-        sensor => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                sensor.id;
-
-
-            option.textContent =
-                `${sensor.codigo} - ${
-                    sensor.nome ??
-                    "Sem nome"
-                }`;
-
-
-            sensorSelect.appendChild(
-                option
-            );
-
-        }
-    );
-
-}
-
-
-
 async function carregarSensores() {
-
-    mostrarCarregamento();
-
-
     try {
+        const sensores = await listarSensoresDisponiveis();
+        sensores.forEach(sensor => {
+            sensorSelect.add(new Option(`${sensor.codigo} - ${sensor.nome ?? "Sem nome"}`, sensor.id));
+        });
+        sensorSelect.add(new Option("Cadastrar um novo ESP", "novo"));
+        if (sensores.length === 0) sensorSelect.value = "novo";
 
-        const sensores =
-            await listarSensoresDisponiveis();
-
-
-        console.log(
-            `[CADASTRO] ${sensores.length} sensor(es) disponível(is).`
-        );
-
-
-        if (
-            sensores.length === 0
-        ) {
-
-            mostrarSemSensores();
-
-            btnSalvar.disabled = true;
-
-            return;
-
-        }
-
-
-        preencherSelectSensores(
-            sensores
-        );
-
-
-        mostrarSelect();
-
-
+        sensorContainer.classList.remove("oculto");
+        atualizarCamposSensor();
         btnSalvar.disabled = false;
-
-
-        console.log(
-            "[CADASTRO] Sensores carregados."
-        );
-
-
     } catch (erro) {
-
-        console.error(
-            "[CADASTRO] Erro ao carregar sensores:",
-            erro
-        );
-
-
-        mostrarSemSensores();
-
-
-        btnSalvar.disabled = true;
-
-
-        mostrarMensagem(
-            "Não foi possível carregar os sensores.",
-            "erro"
-        );
-
+        console.error("[CADASTRO] Erro ao carregar sensores:", erro);
+        mostrarMensagem("Não foi possível carregar os sensores. Recarregue a página para tentar novamente.", "erro");
+    } finally {
+        sensorCarregando.classList.add("oculto");
     }
-
 }
-
-
 
 /* =========================================================
    CONVERSÃO DOS CAMPOS
@@ -463,209 +313,35 @@ function bloquearFormulario() {
    CADASTRAR
 ========================================================= */
 
-async function cadastrar(
-    evento
-) {
-
+async function cadastrar(evento) {
     evento.preventDefault();
-
-
     esconderMensagem();
 
-
-    /* -----------------------------------------------------
-       1. Montar dados
-    ----------------------------------------------------- */
-
-    const caixa =
-        obterDadosCaixa();
-
-
-    const sensorId =
-        Number(
-            sensorSelect.value
-        );
-
-
-    /* -----------------------------------------------------
-       2. Validar
-    ----------------------------------------------------- */
-
-    const validacao =
-        validarCaixa(
-            caixa,
-            sensorId
-        );
-
-
-    if (
-        !validacao.valido
-    ) {
-
-        mostrarMensagem(
-            validacao.mensagem,
-            "erro"
-        );
-
+    const caixa = obterDadosCaixa();
+    const novoSensor = sensorSelect.value === "novo";
+    const sensorId = novoSensor ? null : Number(sensorSelect.value);
+    const codigo = novoSensor ? codigoNovoSensor.value.trim() : "";
+    const validacao = validarCaixa(caixa, sensorId, codigo);
+    if (!validacao.valido) {
+        mostrarMensagem(validacao.mensagem, "erro");
         return;
-
     }
 
-
-    definirProcessando(
-        true
-    );
-
-
-    let caixaCriada = null;
-
-
+    definirProcessando(true);
     try {
-
-        console.group(
-            "CADASTRO COMPLETO"
-        );
-
-
-        console.log(
-            "📦 Criando caixa..."
-        );
-
-
-        /* -------------------------------------------------
-           3. Criar caixa
-        ------------------------------------------------- */
-
-        caixaCriada =
-            await cadastrarCaixa(
-                caixa
-            );
-
-
-        console.log(
-            "✅ Caixa criada:",
-            caixaCriada
-        );
-
-
-        /* -------------------------------------------------
-           4. Associar sensor
-        ------------------------------------------------- */
-
-        console.log(
-            `🔗 Associando sensor ${sensorId} à caixa ${caixaCriada.id}...`
-        );
-
-
-        const sensorAssociado =
-            await associarSensorCaixa(
-                sensorId,
-                caixaCriada.id
-            );
-
-
-        console.log(
-            "✅ Sensor associado:",
-            sensorAssociado
-        );
-
-
-        /* -------------------------------------------------
-           5. Guardar ID no HTML para debug/testes
-        ------------------------------------------------- */
-
-        form.dataset.caixaId =
-            caixaCriada.id;
-
-
-        /* -------------------------------------------------
-           6. Mostrar sucesso
-        ------------------------------------------------- */
-
-        mostrarMensagem(
-            `Caixa ${caixaCriada.codigo} cadastrada com sucesso.`,
-            "sucesso"
-        );
-
-
-        console.log(
-            "🎉 CADASTRO COMPLETO REALIZADO."
-        );
-
-
-        console.log(
-            `Caixa ID: ${caixaCriada.id}`
-        );
-
-
-        console.log(
-            `Sensor ID: ${sensorId}`
-        );
-
-
+        const caixaCriada = await cadastrarCaixaComSensor(caixa, sensorId, codigo);
+        form.dataset.caixaId = caixaCriada.id;
+        abrirCaixa.href = `./dashboard.html?caixa=${caixaCriada.id}`;
+        abrirCaixa.hidden = false;
+        mostrarMensagem(`Caixa ${caixaCriada.codigo} cadastrada com o ESP associado.`, "sucesso");
         bloquearFormulario();
-
-
+        abrirCaixa.focus();
     } catch (erro) {
-
-        console.error(
-            "❌ Erro durante o cadastro:",
-            erro
-        );
-
-
-        /*
-         * Neste momento ainda NÃO temos
-         * rollback automático.
-         *
-         * Se a caixa tiver sido criada e
-         * a associação do sensor falhar,
-         * avisamos explicitamente.
-         */
-
-        if (
-            caixaCriada
-        ) {
-
-            mostrarMensagem(
-                "A caixa foi criada, mas ocorreu um erro ao associar o sensor. Não tente cadastrar novamente antes de verificar o Supabase.",
-                "erro"
-            );
-
-        } else {
-
-            mostrarMensagem(
-                erro.message,
-                "erro"
-            );
-
-        }
-
-
+        mostrarMensagem(erro.message, "erro");
     } finally {
-
-        console.groupEnd();
-
-
-        /*
-         * Se houve sucesso, bloquearFormulario()
-         * já deixou tudo desabilitado.
-         */
-        if (
-            !form.dataset.caixaId
-        ) {
-
-            definirProcessando(
-                false
-            );
-
-        }
-
+        if (!form.dataset.caixaId) definirProcessando(false);
     }
-
 }
-
-
 
 /* =========================================================
    RESET
@@ -693,28 +369,4 @@ form.addEventListener(
 
 
 
-/* =========================================================
-   INICIALIZAÇÃO
-========================================================= */
-
-async function iniciarPagina() {
-
-    console.log(
-        "[CADASTRO] Inicializando..."
-    );
-
-
-    esconderMensagem();
-
-
-    await carregarSensores();
-
-
-    console.log(
-        "[CADASTRO] Página pronta."
-    );
-
-}
-
-
-iniciarPagina();
+if (await protegerPagina("caixas")) await carregarSensores();

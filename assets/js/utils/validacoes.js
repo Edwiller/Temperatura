@@ -43,7 +43,8 @@ export function numeroValido(valor) {
  */
 export function validarCaixa(
     caixa,
-    sensorId
+    sensorId,
+    codigoNovoSensor = ""
 ) {
 
     if (textoVazio(caixa.codigo)) {
@@ -121,7 +122,7 @@ export function validarCaixa(
         return {
             valido: false,
             mensagem:
-                "O peso do gelo não pode ser negativo."
+                "A quantidade de Gelox deve ser um número válido e não pode ser negativa."
         };
 
     }
@@ -167,12 +168,14 @@ export function validarCaixa(
     }
 
 
-    if (
-        !sensorId ||
-        !Number.isInteger(sensorId) ||
-        sensorId <= 0
-    ) {
+    if (codigoNovoSensor && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/.test(codigoNovoSensor)) {
+        return {
+            valido: false,
+            mensagem: "Informe um código de ESP com letras, números, pontos, hífens ou sublinhados."
+        };
+    }
 
+    if (!codigoNovoSensor && (!Number.isInteger(sensorId) || sensorId <= 0)) {
         return {
             valido: false,
             mensagem:
